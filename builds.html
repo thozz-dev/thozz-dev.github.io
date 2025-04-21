@@ -1,0 +1,1532 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Code Building Interactive Demo</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --main-bg-color: #0a0a0a;
+      --accent-color: #ff0000;
+      --secondary-accent: #00aaff;
+      --text-color: #ffffff;
+      --secondary-bg: #121212;
+      --highlight-color: #ff3333;
+      --card-bg: #1a1a1a;
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Montserrat', sans-serif;
+      user-select: none;
+    }
+    
+    body {
+      background-color: var(--main-bg-color);
+      color: var(--text-color);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+    }
+    
+    .container {
+      display: flex;
+      flex: 1;
+      height: calc(100vh - 60px);
+    }
+    
+    .code-panel {
+      width: 350px;
+      background-color: var(--secondary-bg);
+      padding: 20px;
+      overflow-y: auto;
+      border-right: 1px solid var(--accent-color);
+    }
+    
+    .code-block {
+      background-color: var(--card-bg);
+      border-left: 3px solid var(--accent-color);
+      padding: 12px;
+      margin-bottom: 15px;
+      border-radius: 5px;
+      cursor: grab;
+      transition: transform 0.2s, box-shadow 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .code-block::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 100%);
+      pointer-events: none;
+    }
+    
+    .code-block:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 5px 15px rgba(255, 0, 0, 0.2);
+    }
+    
+    .code-block:active {
+      cursor: grabbing;
+    }
+    
+    .code-block.selected {
+      background-color: rgba(255, 0, 0, 0.15);
+    }
+    
+    .code-icon {
+      font-size: 2rem;
+      margin-right: 12px;
+      color: var(--accent-color);
+      width: 40px;
+      text-align: center;
+    }
+    
+    .code-info {
+      flex: 1;
+    }
+    
+    .code-name {
+      font-size: 0.9rem;
+      font-weight: bold;
+      margin-bottom: 4px;
+    }
+    
+    .code-desc {
+      font-size: 0.8rem;
+      opacity: 0.7;
+    }
+    
+    .canvas-container {
+      flex: 1;
+      position: relative;
+    }
+    
+    #build-canvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+    
+    .build-area {
+      background-color: rgba(20, 20, 20, 0.8);
+      border: 1px dashed var(--accent-color);
+      padding: 20px;
+      height: 100%;
+      overflow-y: auto;
+    }
+    
+    header {
+      background-color: var(--secondary-bg);
+      padding: 15px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--accent-color);
+    }
+    
+    .title {
+      font-size: 1.2rem;
+      font-weight: bold;
+      color: var(--accent-color);
+      display: flex;
+      align-items: center;
+    }
+    
+    .title i {
+      margin-right: 10px;
+    }
+    
+    .controls {
+      display: flex;
+      gap: 10px;
+    }
+    
+    button {
+      background-color: var(--accent-color);
+      color: white;
+      border: none;
+      padding: 8px 15px;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background-color 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    
+    button:hover {
+      background-color: var(--highlight-color);
+    }
+
+    a {
+      background-color: var(--accent-color);
+      color: white;
+      border: none;
+      padding: 8px 15px;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background-color 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      text-decoration: none;
+    }
+
+    a:hover {
+      background-color: var(--highlight-color);
+    }
+    
+    .block-category {
+      margin-bottom: 20px;
+    }
+    
+    .category-title {
+      font-size: 0.9rem;
+      color: var(--accent-color);
+      margin-bottom: 10px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      display: flex;
+      align-items: center;
+    }
+    
+    .category-title i {
+      margin-right: 8px;
+    }
+    
+    .info-panel {
+      position: absolute;
+      bottom: 20px;
+      right: 20px;
+      background-color: rgba(18, 18, 18, 0.9);
+      padding: 15px;
+      border-radius: 5px;
+      border-left: 3px solid var(--accent-color);
+      max-width: 250px;
+      z-index: 10;
+    }
+    
+    .info-title {
+      color: var(--accent-color);
+      margin-bottom: 8px;
+      font-size: 1rem;
+      display: flex;
+      align-items: center;
+    }
+    
+    .info-title i {
+      margin-right: 8px;
+    }
+    
+    .info-content {
+      font-size: 0.9rem;
+      line-height: 1.4;
+    }
+    
+    .tooltip {
+      position: absolute;
+      background-color: rgba(0, 0, 0, 0.8);
+      color: white;
+      padding: 8px 12px;
+      border-radius: 4px;
+      font-size: 12px;
+      pointer-events: none;
+      z-index: 100;
+      display: none;
+      border-left: 2px solid var(--accent-color);
+      max-width: 200px;
+    }
+    
+    .camera-controls {
+      position: absolute;
+      bottom: 20px;
+      left: 370px;
+      z-index: 10;
+      display: flex;
+      gap: 10px;
+    }
+    
+    .camera-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background-color: rgba(0, 0, 0, 0.6);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      border: 1px solid var(--accent-color);
+      transition: all 0.2s;
+    }
+    
+    .camera-btn:hover {
+      background-color: var(--accent-color);
+    }
+    
+    .object-controls {
+      position: absolute;
+      display: none;
+      background-color: rgba(0, 0, 0, 0.8);
+      padding: 8px;
+      border-radius: 4px;
+      z-index: 20;
+      border: 1px solid var(--accent-color);
+    }
+    
+    .control-btn {
+      width: 30px;
+      height: 30px;
+      background-color: rgba(255, 255, 255, 0.2);
+      border: none;
+      color: white;
+      margin: 2px;
+      border-radius: 3px;
+      cursor: pointer;
+    }
+    
+    .control-btn:hover {
+      background-color: var(--accent-color);
+    }
+    
+    .mode-switch {
+      position: absolute;
+      top: 80px;
+      right: 20px;
+      background-color: rgba(18, 18, 18, 0.9);
+      padding: 10px;
+      border-radius: 5px;
+      border-left: 3px solid var(--accent-color);
+      z-index: 10;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+    
+    .mode-btn {
+      background-color: rgba(255, 255, 255, 0.1);
+      padding: 5px 10px;
+      border-radius: 3px;
+      cursor: pointer;
+      font-size: 0.8rem;
+      transition: all 0.2s;
+    }
+    
+    .mode-btn.active {
+      background-color: var(--accent-color);
+    }
+    
+    .mode-btn:hover:not(.active) {
+      background-color: rgba(255, 255, 255, 0.2);
+    }
+    
+    /* FiveM Inspired Elements */
+    .fivem-hud {
+      position: absolute;
+      top: 20px;
+      left: 370px;
+      display: flex;
+      gap: 10px;
+      z-index: 10;
+    }
+    
+    .hud-item {
+      background-color: rgba(0, 0, 0, 0.7);
+      padding: 8px 12px;
+      border-radius: 3px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 0.8rem;
+      border-left: 2px solid var(--accent-color);
+    }
+    
+    .notification {
+      position: absolute;
+      top: 80px;
+      left: 370px;
+      background-color: rgba(0, 0, 0, 0.8);
+      padding: 10px 15px;
+      border-radius: 3px;
+      border-left: 3px solid var(--accent-color);
+      font-size: 0.9rem;
+      z-index: 30;
+      opacity: 0;
+      transition: opacity 0.3s;
+      max-width: 300px;
+    }
+    
+    .notification.show {
+      opacity: 1;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="title"><i class="fas fa-code"></i>Building</div>
+    <a href="index.html"><i class="fa-solid fa-right-from-bracket"></i>Revenir au site</a>
+    <div class="controls">
+      <button id="reset-btn"><i class="fas fa-trash-alt"></i> Réinitialiser</button>
+      <button id="run-btn"><i class="fas fa-play"></i> Exécuter</button>
+    </div>
+  </header>
+  
+  <div class="container">
+    <div class="code-panel">
+      <div class="block-category">
+        <div class="category-title"><i class="fas fa-building"></i> Structures</div>
+        <div class="code-block" data-type="building" data-height="5" data-color="#ff3333" draggable="true">
+          <div class="code-icon"><i class="fas fa-building"></i></div>
+          <div class="code-info">
+            <div class="code-name">Bâtiment</div>
+            <div class="code-desc">Un bâtiment commercial avec lumières</div>
+          </div>
+        </div>
+        <div class="code-block" data-type="tower" data-height="10" data-color="#3366ff" draggable="true">
+          <div class="code-icon"><i class="fas fa-chess-rook"></i></div>
+          <div class="code-info">
+            <div class="code-name">Tour</div>
+            <div class="code-desc">Une tour haute avec toit pointu</div>
+          </div>
+        </div>
+        <div class="code-block" data-type="road" data-color="#666666" draggable="true">
+          <div class="code-icon"><i class="fas fa-road"></i></div>
+          <div class="code-info">
+            <div class="code-name">Route</div>
+            <div class="code-desc">Section de route avec marquage</div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="block-category">
+        <div class="category-title"><i class="fas fa-tree"></i> Décorations</div>
+        <div class="code-block" data-type="tree" data-height="2" data-color="#33cc33" draggable="true">
+          <div class="code-icon"><i class="fas fa-tree"></i></div>
+          <div class="code-info">
+            <div class="code-name">Arbres</div>
+            <div class="code-desc">Groupe d'arbres décoratifs</div>
+          </div>
+        </div>
+        <div class="code-block" data-type="fountain" data-color="#33ccff" draggable="true">
+          <div class="code-icon"><i class="fas fa-water"></i></div>
+          <div class="code-info">
+            <div class="code-name">Fontaine</div>
+            <div class="code-desc">Fontaine d'eau animée</div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="block-category">
+        <div class="category-title"><i class="fas fa-lightbulb"></i> Effets</div>
+        <div class="code-block" data-type="light" data-color="#ffff33" draggable="true">
+          <div class="code-icon"><i class="fas fa-lightbulb"></i></div>
+          <div class="code-info">
+            <div class="code-name">Lampadaires</div>
+            <div class="code-desc">Éclairage urbain</div>
+          </div>
+        </div>
+        <div class="code-block" data-type="animation" data-color="#cc33ff" draggable="true">
+          <div class="code-icon"><i class="fas fa-magic"></i></div>
+          <div class="code-info">
+            <div class="code-name">Animation</div>
+            <div class="code-desc">Ajoute du mouvement aux objets</div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="block-category">
+        <div class="category-title"><i class="fas fa-car"></i> Véhicules</div>
+        <div class="code-block" data-type="car" data-color="#ff9900" draggable="true">
+          <div class="code-icon"><i class="fas fa-car"></i></div>
+          <div class="code-info">
+            <div class="code-name">Voiture civile</div>
+            <div class="code-desc">Véhicule civil standard</div>
+          </div>
+        </div>
+        <div class="code-block" data-type="police" data-color="#3366ff" draggable="true">
+          <div class="code-icon"><i class="fas fa-car-side"></i></div>
+          <div class="code-info">
+            <div class="code-name">Voiture police</div>
+            <div class="code-desc">Véhicule de police avec gyrophares</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="canvas-container">
+      <canvas id="build-canvas"></canvas>
+      
+      <div class="fivem-hud">
+        <div class="hud-item"><i class="fas fa-map-marker-alt"></i> <span id="coords">0, 0</span></div>
+        <div class="hud-item"><i class="fas fa-cube"></i> <span id="object-count">0</span> objets</div>
+      </div>
+      
+      <div class="mode-switch">
+        <div class="mode-btn active" data-mode="place">Placer</div>
+        <div class="mode-btn" data-mode="edit">Éditer</div>
+        <div class="mode-btn" data-mode="delete">Supprimer</div>
+      </div>
+      
+      <div class="camera-controls">
+        <div class="camera-btn" id="cam-top"><i class="fas fa-arrow-up"></i></div>
+        <div class="camera-btn" id="cam-rotate"><i class="fas fa-sync-alt"></i></div>
+        <div class="camera-btn" id="cam-reset"><i class="fas fa-home"></i></div>
+        <div class="camera-btn" id="cam-zoom-in"><i class="fas fa-plus"></i></div>
+        <div class="camera-btn" id="cam-zoom-out"><i class="fas fa-minus"></i></div>
+      </div>
+      
+      <div class="object-controls">
+        <button class="control-btn" id="move-up"><i class="fas fa-arrow-up"></i></button>
+        <button class="control-btn" id="move-down"><i class="fas fa-arrow-down"></i></button>
+        <button class="control-btn" id="move-left"><i class="fas fa-arrow-left"></i></button>
+        <button class="control-btn" id="move-right"><i class="fas fa-arrow-right"></i></button>
+        <button class="control-btn" id="rotate-left"><i class="fas fa-undo"></i></button>
+        <button class="control-btn" id="rotate-right"><i class="fas fa-redo"></i></button>
+        <button class="control-btn" id="remove-obj"><i class="fas fa-trash"></i></button>
+      </div>
+      
+      <div class="info-panel">
+        <div class="info-title"><i class="fas fa-info-circle"></i> Code Building</div>
+        <div class="info-content">
+          Glissez et déposez les éléments de la gauche pour construire votre ville. Cliquez sur un objet pour le modifier. Utilisez les contrôles de caméra pour changer de vue.
+        </div>
+      </div>
+      
+      <div class="notification">Notification</div>
+    </div>
+  </div>
+  
+  <div class="tooltip"></div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const codeBlocks = document.querySelectorAll('.code-block');
+      const buildCanvas = document.getElementById('build-canvas');
+      const resetBtn = document.getElementById('reset-btn');
+      const runBtn = document.getElementById('run-btn');
+      const tooltip = document.querySelector('.tooltip');
+      const coordsDisplay = document.getElementById('coords');
+      const objectCountDisplay = document.getElementById('object-count');
+      const objectControls = document.querySelector('.object-controls');
+      const modeBtns = document.querySelectorAll('.mode-btn');
+      const notification = document.querySelector('.notification');
+      
+      const scene = new THREE.Scene();
+      const camera = new THREE.PerspectiveCamera(75, buildCanvas.clientWidth / buildCanvas.clientHeight, 0.1, 1000);
+      
+      const renderer = new THREE.WebGLRenderer({ 
+        canvas: buildCanvas,
+        antialias: true
+      });
+      renderer.setClearColor(0x0a0a0a);
+      renderer.setSize(buildCanvas.clientWidth, buildCanvas.clientHeight);
+      renderer.shadowMap.enabled = true;
+      renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+
+      let currentMode = 'place';  // place, edit, delete
+      let selectedObject = null;
+      let isDragging = false;
+      let dragStartPosition = new THREE.Vector2();
+      let objects = [];
+      let cameraRotationEnabled = true;
+      let cameraRotationSpeed = 0.0001;
+      let cameraHeight = 15;
+      let cameraDistance = 25;
+
+      function setupScene() {
+        const gridHelper = new THREE.GridHelper(50, 50, 0x666666, 0x222222);
+        scene.add(gridHelper);
+
+        const ambientLight = new THREE.AmbientLight(0x404040, 0.7);
+        scene.add(ambientLight);
+        
+        const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+        directionalLight.position.set(10, 20, 10);
+        directionalLight.castShadow = true;
+        directionalLight.shadow.mapSize.width = 1024;
+        directionalLight.shadow.mapSize.height = 1024;
+        directionalLight.shadow.camera.near = 0.5;
+        directionalLight.shadow.camera.far = 100;
+        scene.add(directionalLight);
+
+        const groundGeometry = new THREE.PlaneGeometry(100, 100);
+        const groundMaterial = new THREE.MeshStandardMaterial({ 
+          color: 0x222222,
+          roughness: 0.8,
+          metalness: 0.2,
+          side: THREE.DoubleSide
+        });
+        const ground = new THREE.Mesh(groundGeometry, groundMaterial);
+        ground.rotation.x = -Math.PI / 2;
+        ground.position.y = -0.1;
+        ground.receiveShadow = true;
+        scene.add(ground);
+
+        updateCamera();
+      }
+      
+      function updateCamera() {
+        const cameraAngle = Date.now() * cameraRotationSpeed;
+        if (cameraRotationEnabled) {
+          camera.position.x = Math.cos(cameraAngle) * cameraDistance;
+          camera.position.z = Math.sin(cameraAngle) * cameraDistance;
+        }
+        camera.position.y = cameraHeight;
+        camera.lookAt(0, 0, 0);
+      }
+
+      function showNotification(message) {
+        notification.textContent = message;
+        notification.classList.add('show');
+        
+        setTimeout(() => {
+          notification.classList.remove('show');
+        }, 3000);
+      }
+      
+      codeBlocks.forEach(block => {
+        block.addEventListener('dragstart', (e) => {
+          e.dataTransfer.setData('text/plain', block.dataset.type);
+          block.classList.add('selected');
+          const dragIcon = document.createElement('div');
+          dragIcon.innerHTML = block.querySelector('.code-icon').innerHTML;
+          dragIcon.style.fontSize = '2rem';
+          dragIcon.style.color = block.dataset.color || '#ff0000';
+          document.body.appendChild(dragIcon);
+          dragIcon.style.position = 'absolute';
+          dragIcon.style.top = '-1000px';
+          e.dataTransfer.setDragImage(dragIcon, 25, 25);
+          
+          setTimeout(() => {
+            document.body.removeChild(dragIcon);
+          }, 0);
+        });
+        
+        block.addEventListener('dragend', () => {
+          block.classList.remove('selected');
+        });
+        
+        block.addEventListener('mouseover', (e) => {
+          const type = block.dataset.type;
+          tooltip.textContent = getDescription(type);
+          tooltip.style.display = 'block';
+          tooltip.style.left = e.pageX + 10 + 'px';
+          tooltip.style.top = e.pageY + 10 + 'px';
+        });
+        
+        block.addEventListener('mousemove', (e) => {
+          tooltip.style.left = e.pageX + 10 + 'px';
+          tooltip.style.top = e.pageY + 10 + 'px';
+        });
+        
+        block.addEventListener('mouseout', () => {
+          tooltip.style.display = 'none';
+        });
+      });
+      
+      buildCanvas.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        if (currentMode === 'place') {
+          buildCanvas.style.cursor = 'copy';
+        }
+      });
+      
+      buildCanvas.addEventListener('dragleave', () => {
+        buildCanvas.style.cursor = 'default';
+      });
+      
+      buildCanvas.addEventListener('drop', (e) => {
+        e.preventDefault();
+        buildCanvas.style.cursor = 'default';
+        
+        if (currentMode !== 'place') {
+          showNotification("Passez en mode 'Placer' pour ajouter des objets");
+          return;
+        }
+        
+        const type = e.dataTransfer.getData('text/plain');
+        if (!type) return;
+        
+        const rect = buildCanvas.getBoundingClientRect();
+        const x = ((e.clientX - rect.left) / buildCanvas.clientWidth) * 2 - 1;
+        const y = -((e.clientY - rect.top) / buildCanvas.clientHeight) * 2 + 1;
+
+        const raycaster = new THREE.Raycaster();
+        raycaster.setFromCamera(new THREE.Vector2(x, y), camera);
+
+        const plane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
+        const point = new THREE.Vector3();
+        raycaster.ray.intersectPlane(plane, point);
+
+        point.x = Math.round(point.x);
+        point.z = Math.round(point.z);
+        
+        createObject(type, point);
+        showNotification(`${getTypeName(type)} ajouté à la position (${point.x}, ${point.z})`);
+        updateObjectCount();
+      });
+      
+      buildCanvas.addEventListener('click', (e) => {
+        if (currentMode === 'edit' || currentMode === 'delete') {
+          const rect = buildCanvas.getBoundingClientRect();
+          const x = ((e.clientX - rect.left) / buildCanvas.clientWidth) * 2 - 1;
+          const y = -((e.clientY - rect.top) / buildCanvas.clientHeight) * 2 + 1;
+
+          const raycaster = new THREE.Raycaster();
+          raycaster.setFromCamera(new THREE.Vector2(x, y), camera);
+
+          const intersects = raycaster.intersectObjects(scene.children, true);
+          
+          let selectedMesh = null;
+          for (let i = 0; i < intersects.length; i++) {
+            const obj = findParentUserData(intersects[i].object);
+            if (obj && obj.userData.type) {
+              selectedMesh = obj;
+              break;
+            }
+          }
+          
+          if (selectedMesh) {
+            if (currentMode === 'edit') {
+              selectObject(selectedMesh);
+            } else if (currentMode === 'delete') {
+              removeObject(selectedMesh);
+              showNotification(`${getTypeName(selectedMesh.userData.type)} supprimé`);
+              updateObjectCount();
+            }
+          } else {
+            if (selectedObject) {
+              deselectObject();
+            }
+          }
+        }
+      });
+
+      function selectObject(object) {
+        if (selectedObject) {
+            deselectObject();
+        }
+        
+        selectedObject = object;
+
+        const existingSelectionBox = scene.getObjectByName("selectionBox");
+        if (existingSelectionBox) {
+            scene.remove(existingSelectionBox);
+        }
+        
+        const selectionBox = new THREE.BoxHelper(object, 0xff0000);
+        selectionBox.name = "selectionBox";
+        scene.add(selectionBox);
+        
+        const vector = new THREE.Vector3();
+        object.getWorldPosition(vector);
+        vector.project(camera);
+        
+        const widthHalf = window.innerWidth / 2;
+        const heightHalf = window.innerHeight / 2;
+        
+        vector.x = (vector.x * widthHalf) + widthHalf;
+        vector.y = - (vector.y * heightHalf) + heightHalf;
+        
+        objectControls.style.display = 'block';
+        objectControls.style.left = `${vector.x - objectControls.offsetWidth / 2}px`;
+        objectControls.style.top = `${vector.y - objectControls.offsetHeight - 20}px`;
+
+        coordsDisplay.textContent = `${Math.round(object.position.x)}, ${Math.round(object.position.z)}`;
+      }
+      
+        function deselectObject() {
+            if (!selectedObject) return;
+            
+            const selectionBox = scene.getObjectByName("selectionBox");
+            if (selectionBox) {
+            scene.remove(selectionBox);
+            }
+
+            objectControls.style.display = 'none';
+            
+            selectedObject = null;
+        }
+      
+        function moveObject(direction) {
+            if (!selectedObject) return;
+            
+            switch (direction) {
+                case 'up':
+                    selectedObject.position.z -= 1;
+                    break;
+                case 'down':
+                    selectedObject.position.z += 1;
+                    break;
+                case 'left':
+                    selectedObject.position.x -= 1;
+                    break;
+                case 'right':
+                    selectedObject.position.x += 1;
+                    break;
+            }
+
+            const existingSelectionBox = scene.getObjectByName("selectionBox");
+            if (existingSelectionBox) {
+                scene.remove(existingSelectionBox);
+            }
+            
+            const selectionBox = new THREE.BoxHelper(selectedObject, 0xff0000);
+            selectionBox.name = "selectionBox";
+            scene.add(selectionBox);
+
+            selectionBox.update();
+        
+            const vector = new THREE.Vector3();
+            selectedObject.getWorldPosition(vector);
+            vector.project(camera);
+            
+            const widthHalf = window.innerWidth / 2;
+            const heightHalf = window.innerHeight / 2;
+            
+            vector.x = (vector.x * widthHalf) + widthHalf;
+            vector.y = - (vector.y * heightHalf) + heightHalf;
+            
+            objectControls.style.left = `${vector.x - objectControls.offsetWidth / 2}px`;
+            objectControls.style.top = `${vector.y - objectControls.offsetHeight - 20}px`;
+
+            coordsDisplay.textContent = `${Math.round(selectedObject.position.x)}, ${Math.round(selectedObject.position.z)}`;
+        }
+
+        function rotateObject(direction) {
+            if (!selectedObject) return;
+            
+            const rotationAmount = Math.PI / 8;
+            
+            if (direction === 'left') {
+                selectedObject.rotation.y += rotationAmount;
+            } else {
+                selectedObject.rotation.y -= rotationAmount;
+            }
+
+            const existingSelectionBox = scene.getObjectByName("selectionBox");
+            if (existingSelectionBox) {
+                scene.remove(existingSelectionBox);
+            }
+
+            const selectionBox = new THREE.BoxHelper(selectedObject, 0xff0000);
+            selectionBox.name = "selectionBox";
+            scene.add(selectionBox);
+
+            selectionBox.update();
+        }
+
+        function removeObject(object) {
+        const objToRemove = object || selectedObject;
+        if (!objToRemove) return;
+
+        const index = objects.findIndex(o => o.id === objToRemove.id);
+        if (index !== -1) {
+            objects.splice(index, 1);
+        }
+
+        while(objToRemove.children.length > 0) { 
+            objToRemove.remove(objToRemove.children[0]); 
+        }
+        
+        scene.remove(objToRemove);
+
+        if (objToRemove === selectedObject) {
+            deselectObject();
+        }
+        }
+
+        function updateObjectCount() {
+        objectCountDisplay.textContent = objects.length;
+        }
+
+        function findParentUserData(object) {
+        let current = object;
+        while (current && !current.userData.type) {
+            current = current.parent;
+        }
+        return current;
+        }
+
+        function getTypeName(type) {
+        const typeNames = {
+            'building': 'Bâtiment',
+            'tower': 'Tour',
+            'road': 'Route',
+            'tree': 'Arbres',
+            'fountain': 'Fontaine',
+            'light': 'Lampadaires',
+            'animation': 'Animation',
+            'car': 'Voiture civile',
+            'police': 'Voiture de police'
+        };
+        return typeNames[type] || type;
+        }
+
+        function getDescription(type) {
+        const descriptions = {
+            'building': 'Un bâtiment commercial avec des fenêtres éclairées',
+            'tower': 'Une tour haute avec un design moderne',
+            'road': 'Section de route avec marquage au sol',
+            'tree': 'Un groupe d\'arbres qui ajoutent de la végétation',
+            'fountain': 'Une fontaine d\'eau décorative avec animation',
+            'light': 'Des lampadaires pour éclairer votre ville',
+            'animation': 'Effet d\'animation applicable aux autres objets',
+            'car': 'Véhicule civil qui peut être placé sur les routes',
+            'police': 'Véhicule de police avec lumières clignotantes'
+        };
+        return descriptions[type] || 'Objet de construction';
+        }
+
+        function createObject(type, position) {
+        let object;
+        
+        switch(type) {
+            case 'building':
+            object = createBuilding(position, parseFloat(getBlockDataByType(type, 'height')), getBlockDataByType(type, 'color'));
+            break;
+            case 'tower':
+            object = createTower(position, parseFloat(getBlockDataByType(type, 'height')), getBlockDataByType(type, 'color'));
+            break;
+            case 'road':
+            object = createRoad(position, getBlockDataByType(type, 'color'));
+            break;
+            case 'tree':
+            object = createTrees(position, getBlockDataByType(type, 'color'));
+            break;
+            case 'fountain':
+            object = createFountain(position, getBlockDataByType(type, 'color'));
+            break;
+            case 'light':
+            object = createLights(position, getBlockDataByType(type, 'color'));
+            break;
+            case 'car':
+            case 'police':
+            object = createVehicle(position, type, getBlockDataByType(type, 'color'));
+            break;
+            case 'animation':
+            if (selectedObject) {
+                applyAnimation(selectedObject);
+                return;
+            } else {
+                showNotification("Sélectionnez un objet avant d'appliquer une animation");
+                return;
+            }
+            default:
+            const geometry = new THREE.BoxGeometry(1, 1, 1);
+            const material = new THREE.MeshStandardMaterial({ color: 0xff0000 });
+            object = new THREE.Mesh(geometry, material);
+            object.position.copy(position);
+        }
+        
+        if (object) {
+            object.userData.type = type;
+            scene.add(object);
+            objects.push(object);
+        }
+        
+        return object;
+        }
+
+        function getBlockDataByType(type, property) {
+        const block = Array.from(codeBlocks).find(block => block.dataset.type === type);
+        return block ? block.dataset[property] : null;
+        }
+
+        function createBuilding(position, height = 5, color = '#ff3333') {
+        const group = new THREE.Group();
+
+        const buildingGeometry = new THREE.BoxGeometry(2, height, 2);
+        const buildingMaterial = new THREE.MeshStandardMaterial({ 
+            color: new THREE.Color(color),
+            roughness: 0.7,
+            metalness: 0.2
+        });
+        
+        const building = new THREE.Mesh(buildingGeometry, buildingMaterial);
+        building.position.y = height / 2;
+        building.castShadow = true;
+        building.receiveShadow = true;
+        group.add(building);
+        
+        const windowMaterial = new THREE.MeshStandardMaterial({
+            color: 0xffffaa,
+            emissive: 0xffffaa,
+            emissiveIntensity: 0.5,
+            roughness: 0.2,
+            metalness: 0.8
+        });
+        
+        for (let i = 0; i < 4; i++) {
+            for (let j = 1; j < height; j++) {
+            const windowGeometry = new THREE.PlaneGeometry(0.3, 0.3);
+            const windowMesh = new THREE.Mesh(windowGeometry, windowMaterial);
+
+            switch(i) {
+                case 0:
+                windowMesh.position.set(0, j, 1.01);
+                break;
+                case 1:
+                windowMesh.position.set(1.01, j, 0);
+                windowMesh.rotation.y = Math.PI / 2;
+                break;
+                case 2:
+                windowMesh.position.set(0, j, -1.01);
+                windowMesh.rotation.y = Math.PI;
+                break;
+                case 3:
+                windowMesh.position.set(-1.01, j, 0);
+                windowMesh.rotation.y = -Math.PI / 2;
+                break;
+            }
+            
+            group.add(windowMesh);
+            }
+        }
+        
+        group.position.copy(position);
+        group.position.y = 0;
+        
+        return group;
+        }
+
+        function createTower(position, height = 10, color = '#3366ff') {
+        const group = new THREE.Group();
+
+        const towerGeometry = new THREE.CylinderGeometry(1, 1.5, height, 8);
+        const towerMaterial = new THREE.MeshStandardMaterial({
+            color: new THREE.Color(color),
+            roughness: 0.6,
+            metalness: 0.3
+        });
+        
+        const tower = new THREE.Mesh(towerGeometry, towerMaterial);
+        tower.position.y = height / 2;
+        tower.castShadow = true;
+        tower.receiveShadow = true;
+        group.add(tower);
+
+        const roofGeometry = new THREE.ConeGeometry(1.2, 2, 8);
+        const roofMaterial = new THREE.MeshStandardMaterial({
+            color: 0x333333,
+            roughness: 0.7,
+            metalness: 0.2
+        });
+        
+        const roof = new THREE.Mesh(roofGeometry, roofMaterial);
+        roof.position.y = height + 1;
+        roof.castShadow = true;
+        group.add(roof);
+
+        const windowMaterial = new THREE.MeshStandardMaterial({
+            color: 0xaaddff,
+            emissive: 0xaaddff,
+            emissiveIntensity: 0.3,
+            roughness: 0.2,
+            metalness: 0.8
+        });
+
+        for (let i = 0; i < 8; i++) {
+            const angle = (i / 8) * Math.PI * 2;
+            
+            for (let j = 1; j < height; j += 2) {
+            const windowGeometry = new THREE.CircleGeometry(0.2, 8);
+            const windowMesh = new THREE.Mesh(windowGeometry, windowMaterial);
+            
+            windowMesh.position.x = Math.cos(angle) * 1.01;
+            windowMesh.position.z = Math.sin(angle) * 1.01;
+            windowMesh.position.y = j;
+
+            windowMesh.lookAt(
+                windowMesh.position.x * 2,
+                windowMesh.position.y,
+                windowMesh.position.z * 2
+            );
+            
+            group.add(windowMesh);
+            }
+        }
+        
+        group.position.copy(position);
+        group.position.y = 0;
+        
+        return group;
+        }
+
+        function createRoad(position, color = '#666666') {
+        const group = new THREE.Group();
+
+        const roadGeometry = new THREE.PlaneGeometry(2, 4);
+        const roadMaterial = new THREE.MeshStandardMaterial({
+            color: new THREE.Color(color),
+            roughness: 0.9,
+            metalness: 0.1,
+            side: THREE.DoubleSide
+        });
+        
+        const road = new THREE.Mesh(roadGeometry, roadMaterial);
+        road.rotation.x = -Math.PI / 2;
+        road.position.y = 0.01;
+        group.add(road);
+
+        const lineGeometry = new THREE.PlaneGeometry(0.1, 3.8);
+        const lineMaterial = new THREE.MeshStandardMaterial({
+            color: 0xffffff,
+            roughness: 0.8,
+            side: THREE.DoubleSide
+        });
+        
+        const line = new THREE.Mesh(lineGeometry, lineMaterial);
+        line.rotation.x = -Math.PI / 2;
+        line.position.y = 0.02;
+        group.add(line);
+        
+        group.position.copy(position);
+        group.position.y = 0;
+        
+        return group;
+        }
+
+        function createTrees(position, color = '#33cc33') {
+        const group = new THREE.Group();
+        
+        for (let i = 0; i < 5; i++) {
+            const treeGroup = new THREE.Group();
+
+            const trunkGeometry = new THREE.CylinderGeometry(0.1, 0.15, 0.8, 8);
+            const trunkMaterial = new THREE.MeshStandardMaterial({
+            color: 0x8B4513,
+            roughness: 0.9
+            });
+            
+            const trunk = new THREE.Mesh(trunkGeometry, trunkMaterial);
+            trunk.position.y = 0.4;
+            trunk.castShadow = true;
+            treeGroup.add(trunk);
+            
+            const leavesGeometry = new THREE.ConeGeometry(0.5, 1.2, 8);
+            const leavesMaterial = new THREE.MeshStandardMaterial({
+            color: new THREE.Color(color),
+            roughness: 0.8
+            });
+            
+            const leaves = new THREE.Mesh(leavesGeometry, leavesMaterial);
+            leaves.position.y = 1.2;
+            leaves.castShadow = true;
+            treeGroup.add(leaves);
+
+            const angle = Math.random() * Math.PI * 2;
+            const distance = Math.random() * 0.7;
+            treeGroup.position.x = Math.cos(angle) * distance;
+            treeGroup.position.z = Math.sin(angle) * distance;
+            
+            group.add(treeGroup);
+        }
+        
+        group.position.copy(position);
+        
+        return group;
+        }
+
+        function createFountain(position, color = '#33ccff') {
+        const group = new THREE.Group();
+        
+        const baseGeometry = new THREE.CylinderGeometry(1.2, 1.5, 0.5, 16);
+        const baseMaterial = new THREE.MeshStandardMaterial({
+            color: 0x888888,
+            roughness: 0.8
+        });
+        
+        const base = new THREE.Mesh(baseGeometry, baseMaterial);
+        base.position.y = 0.25;
+        base.castShadow = true;
+        base.receiveShadow = true;
+        group.add(base);
+
+        const waterGeometry = new THREE.CylinderGeometry(1, 1, 0.2, 16);
+        const waterMaterial = new THREE.MeshStandardMaterial({
+            color: new THREE.Color(color),
+            transparent: true,
+            opacity: 0.7,
+            roughness: 0.2,
+            metalness: 0.1
+        });
+        
+        const water = new THREE.Mesh(waterGeometry, waterMaterial);
+        water.position.y = 0.55;
+        group.add(water);
+
+        const centerGeometry = new THREE.CylinderGeometry(0.2, 0.3, 0.8, 8);
+        const centerMaterial = new THREE.MeshStandardMaterial({
+            color: 0x888888,
+            roughness: 0.7
+        });
+        
+        const center = new THREE.Mesh(centerGeometry, centerMaterial);
+        center.position.y = 0.8;
+        center.castShadow = true;
+        group.add(center);
+
+        const particleGroup = new THREE.Group();
+        water.userData.particles = particleGroup;
+        group.add(particleGroup);
+
+        for (let i = 0; i < 20; i++) {
+            const particleGeometry = new THREE.SphereGeometry(0.05, 8, 8);
+            const particleMaterial = new THREE.MeshStandardMaterial({
+            color: new THREE.Color(color),
+            transparent: true,
+            opacity: 0.8
+            });
+            
+            const particle = new THREE.Mesh(particleGeometry, particleMaterial);
+
+            const angle = Math.random() * Math.PI * 2;
+            const distance = Math.random() * 0.5 + 0.2;
+            particle.position.x = Math.cos(angle) * distance;
+            particle.position.z = Math.sin(angle) * distance;
+            particle.position.y = 0.8 + Math.random() * 0.5;
+
+            particle.userData.initialY = particle.position.y;
+            particle.userData.speed = Math.random() * 0.03 + 0.02;
+            particle.userData.phase = Math.random() * Math.PI * 2;
+            
+            particleGroup.add(particle);
+        }
+
+        water.userData.animated = true;
+        
+        group.position.copy(position);
+        
+        return group;
+        }
+
+        function createLights(position, color = '#ffff33') {
+        const group = new THREE.Group();
+
+        for (let i = 0; i < 4; i++) {
+            const lampGroup = new THREE.Group();
+
+            const poleGeometry = new THREE.CylinderGeometry(0.05, 0.05, 1.5, 8);
+            const poleMaterial = new THREE.MeshStandardMaterial({
+            color: 0x333333,
+            roughness: 0.7,
+            metalness: 0.3
+            });
+            
+            const pole = new THREE.Mesh(poleGeometry, poleMaterial);
+            pole.position.y = 0.75;
+            pole.castShadow = true;
+            lampGroup.add(pole);
+
+            const lampGeometry = new THREE.SphereGeometry(0.12, 8, 8);
+            const lampMaterial = new THREE.MeshStandardMaterial({
+            color: new THREE.Color(color),
+            emissive: new THREE.Color(color),
+            emissiveIntensity: 0.5,
+            roughness: 0.5,
+            metalness: 0.7
+            });
+            
+            const lamp = new THREE.Mesh(lampGeometry, lampMaterial);
+            lamp.position.y = 1.5;
+            lampGroup.add(lamp);
+
+            const light = new THREE.PointLight(new THREE.Color(color), 0.5, 3);
+            light.position.copy(lamp.position);
+            lampGroup.add(light);
+
+            const angle = (i / 4) * Math.PI * 2;
+            lampGroup.position.x = Math.cos(angle) * 0.8;
+            lampGroup.position.z = Math.sin(angle) * 0.8;
+            
+            group.add(lampGroup);
+        }
+        
+        group.position.copy(position);
+        
+        return group;
+        }
+
+        function createVehicle(position, type, color) {
+        const group = new THREE.Group();
+
+        const bodyGeometry = new THREE.BoxGeometry(1, 0.5, 2);
+        const bodyMaterial = new THREE.MeshStandardMaterial({
+            color: new THREE.Color(color),
+            roughness: 0.5,
+            metalness: 0.7
+        });
+        
+        const body = new THREE.Mesh(bodyGeometry, bodyMaterial);
+        body.position.y = 0.4;
+        body.castShadow = true;
+        body.receiveShadow = true;
+        group.add(body);
+
+        const cabinGeometry = new THREE.BoxGeometry(0.8, 0.4, 1);
+        const cabinMaterial = new THREE.MeshStandardMaterial({
+            color: 0x333333,
+            roughness: 0.5,
+            metalness: 0.5
+        });
+        
+        const cabin = new THREE.Mesh(cabinGeometry, cabinMaterial);
+        cabin.position.y = 0.8;
+        cabin.position.z = -0.2;
+        cabin.castShadow = true;
+        group.add(cabin);
+
+        const wheelGeometry = new THREE.CylinderGeometry(0.2, 0.2, 0.1, 16);
+        wheelGeometry.rotateX(Math.PI / 2);
+        
+        const wheelMaterial = new THREE.MeshStandardMaterial({
+            color: 0x111111,
+            roughness: 0.9
+        });
+
+        const wheelPositions = [
+            { x: -0.5, y: 0.2, z: 0.7 },
+            { x: 0.5, y: 0.2, z: 0.7 },
+            { x: -0.5, y: 0.2, z: -0.7 },
+            { x: 0.5, y: 0.2, z: -0.7 }
+        ];
+        
+        wheelPositions.forEach(pos => {
+            const wheel = new THREE.Mesh(wheelGeometry, wheelMaterial);
+            wheel.position.set(pos.x, pos.y, pos.z);
+            wheel.castShadow = true;
+            group.add(wheel);
+        });
+        
+        if (type === 'police') {
+            const lightBarGeometry = new THREE.BoxGeometry(0.7, 0.1, 0.3);
+            const lightBarMaterial = new THREE.MeshStandardMaterial({
+            color: 0x000000,
+            roughness: 0.8
+            });
+            
+            const lightBar = new THREE.Mesh(lightBarGeometry, lightBarMaterial);
+            lightBar.position.y = 1.05;
+            lightBar.position.z = -0.2;
+            group.add(lightBar);
+            
+            const redLightGeometry = new THREE.BoxGeometry(0.2, 0.1, 0.2);
+            const redLightMaterial = new THREE.MeshStandardMaterial({
+            color: 0xff0000,
+            emissive: 0xff0000,
+            emissiveIntensity: 0.5
+            });
+            
+            const redLight = new THREE.Mesh(redLightGeometry, redLightMaterial);
+            redLight.position.set(-0.2, 1.1, -0.2);
+            group.add(redLight);
+            
+            const blueLight = redLight.clone();
+            blueLight.material = new THREE.MeshStandardMaterial({
+            color: 0x0000ff,
+            emissive: 0x0000ff,
+            emissiveIntensity: 0.5
+            });
+            blueLight.position.set(0.2, 1.1, -0.2);
+            group.add(blueLight);
+            
+            const redPointLight = new THREE.PointLight(0xff0000, 1, 5);
+            redPointLight.position.copy(redLight.position);
+            redPointLight.visible = false;
+            redLight.userData.light = redPointLight;
+            group.add(redPointLight);
+            
+            const bluePointLight = new THREE.PointLight(0x0000ff, 1, 5);
+            bluePointLight.position.copy(blueLight.position);
+            bluePointLight.visible = false;
+            blueLight.userData.light = bluePointLight;
+            group.add(bluePointLight);
+
+            redLight.userData.animated = true;
+            blueLight.userData.animated = true;
+            redLight.userData.animPhase = 0;
+            blueLight.userData.animPhase = Math.PI;
+        }
+        
+        group.position.copy(position);
+        
+        return group;
+        }
+
+        function applyAnimation(object) {
+        object.userData.animated = true;
+
+        if (object.userData.type === 'fountain') {
+            showNotification("Animation appliquée à la fontaine");
+        } else if (object.userData.type === 'light') {
+            showNotification("Animation appliquée aux lampadaires");
+        } else {
+            object.userData.animType = 'rotate';
+            showNotification(`Animation appliquée au ${getTypeName(object.userData.type)}`);
+        }
+        }
+
+        function animate() {
+        requestAnimationFrame(animate);
+
+        objects.forEach(object => {
+            if (object.userData.animated) {
+            updateAnimation(object);
+            }
+        });
+
+        updateCamera();
+
+        if (selectedObject) {
+            const selectionBox = scene.getObjectByName("selectionBox");
+            if (selectionBox) {
+            scene.remove(selectionBox);
+            scene.add(new THREE.BoxHelper(selectedObject, 0xff0000));
+            }
+        }
+        
+        renderer.render(scene, camera);
+        }
+
+        function updateAnimation(object) {
+        const time = Date.now() * 0.001;
+        
+        if (object.userData.type === 'fountain') {
+            const particles = object.userData.particles?.children;
+            if (particles) {
+            particles.forEach(particle => {
+                particle.position.y = particle.userData.initialY + 
+                Math.sin(time * 3 + particle.userData.phase) * particle.userData.speed * 2;
+            });
+            }
+        } else if (object.userData.type === 'police') {
+            object.children.forEach(child => {
+            if (child.userData.animated) {
+                const blinkRate = 5;
+                const isOn = Math.sin(time * blinkRate + child.userData.animPhase) > 0;
+                
+                if (child.userData.light) {
+                child.userData.light.visible = isOn;
+                }
+
+                if (child.material) {
+                child.material.emissiveIntensity = isOn ? 1 : 0.1;
+                }
+            }
+            });
+        } else if (object.userData.animType === 'rotate') {
+            object.rotation.y = Math.sin(time * 0.5) * 0.2;
+        }
+        }
+
+        resetBtn.addEventListener('click', () => {
+        objects.slice().forEach(obj => removeObject(obj));
+        updateObjectCount();
+        showNotification("Tous les objets ont été supprimés");
+        });
+
+        runBtn.addEventListener('click', () => {
+        showNotification("Exécution du code...");
+        
+        objects.forEach(obj => {
+            obj.userData.animated = true;
+        });
+        });
+
+        document.getElementById('move-up').addEventListener('click', () => moveObject('up'));
+        document.getElementById('move-down').addEventListener('click', () => moveObject('down'));
+        document.getElementById('move-left').addEventListener('click', () => moveObject('left'));
+        document.getElementById('move-right').addEventListener('click', () => moveObject('right'));
+        document.getElementById('rotate-left').addEventListener('click', () => rotateObject('left'));
+        document.getElementById('rotate-right').addEventListener('click', () => rotateObject('right'));
+        document.getElementById('remove-obj').addEventListener('click', () => {
+        if (selectedObject) {
+            removeObject();
+            updateObjectCount();
+            showNotification(`${getTypeName(selectedObject.userData.type)} supprimé`);
+        }
+        });
+
+        document.getElementById('cam-top').addEventListener('click', () => {
+        camera.position.set(0, 25, 0);
+        camera.lookAt(0, 0, 0);
+        cameraRotationEnabled = false;
+        });
+
+        document.getElementById('cam-rotate').addEventListener('click', () => {
+        cameraRotationEnabled = !cameraRotationEnabled;
+        if (!cameraRotationEnabled) {
+            showNotification("Rotation de caméra désactivée");
+        } else {
+            showNotification("Rotation de caméra activée");
+        }
+        });
+
+        document.getElementById('cam-reset').addEventListener('click', () => {
+        cameraDistance = 25;
+        cameraHeight = 15;
+        cameraRotationEnabled = true;
+        showNotification("Caméra réinitialisée");
+        });
+
+        document.getElementById('cam-zoom-in').addEventListener('click', () => {
+        cameraDistance = Math.max(5, cameraDistance - 2);
+        });
+
+        document.getElementById('cam-zoom-out').addEventListener('click', () => {
+        cameraDistance = Math.min(40, cameraDistance + 2);
+        });
+
+        modeBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            modeBtns.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            currentMode = btn.dataset.mode;
+            switch(currentMode) {
+            case 'place':
+                buildCanvas.style.cursor = 'default';
+                break;
+            case 'edit':
+                buildCanvas.style.cursor = 'pointer';
+                break;
+            case 'delete':
+                buildCanvas.style.cursor = 'crosshair';
+                break;
+            }
+            
+            if (currentMode !== 'edit' && selectedObject) {
+            deselectObject();
+            }
+            
+            showNotification(`Mode ${currentMode} activé`);
+        });
+        });
+
+        window.addEventListener('resize', () => {
+        camera.aspect = buildCanvas.clientWidth / buildCanvas.clientHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(buildCanvas.clientWidth, buildCanvas.clientHeight);
+        });
+
+        setupScene();
+        animate();
+        updateObjectCount();
+        });
+    </script>
+</body>
+</html>

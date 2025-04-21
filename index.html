@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>.THOZZ - FiveM Developer</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
     :root {
       --main-bg-color: #0a0a0a;
@@ -296,31 +297,38 @@
       margin-top: 50px;
     }
     
-    .form-group {
-      margin-bottom: 20px;
+    .discord-btn {
+        background-color: var(--accent-color); /* Couleur officielle de Discord */
+        color: white;
+        border: none;
+        padding: 12px 20px;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: background-color 0.2s;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        text-decoration: none;
+        font-weight: bold;
+        margin: 20px auto;
+        max-width: 300px;
+        justify-content: center;
+        font-size: 1.0rem;
     }
-    
-    .form-group label {
-      display: block;
-      margin-bottom: 10px;
-      font-weight: 500;
+
+    .discord-btn:hover {
+        background-color: var(--highlight-color);
     }
-    
-    .form-group input,
-    .form-group textarea {
-      width: 100%;
-      padding: 12px;
-      border-radius: 5px;
-      border: none;
-      background-color: rgba(255, 255, 255, 0.1);
-      color: var(--text-color);
+
+    .contact-info {
+        text-align: center;
     }
-    
-    .form-group textarea {
-      height: 150px;
-      resize: vertical;
+
+    .discord-username {
+        margin-top: 10px;
+        color: #666;
     }
-    
+        
     footer {
       background-color: var(--secondary-bg);
       padding: 30px 0;
@@ -389,14 +397,13 @@
       }
     }
     
-    /* 3D City */
     #city-canvas {
       position: absolute;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
-      z-index: 0;
+      z-index: 1;
     }
     
     @media (max-width: 768px) {
@@ -463,7 +470,7 @@
 
   <section id="home" class="hero">
     <div id="code-rain"></div>
-    <canvas id="city-canvas"></canvas>
+    <div id="city-canvas"></div>
     <div class="container">
       <div class="hero-content">
         <h1>Développeur <span>FiveM</span></h1>
@@ -633,26 +640,19 @@
           </div>
         </div>
       </div>
+      <a href="builds.html" class="btn">Tester</a>
     </div>
   </section>
 
   <section id="contact" class="section">
     <div class="container">
       <h2 class="section-title">Contact</h2>
-      <div class="contact-form">
-        <div class="form-group">
-          <label for="name">Nom</label>
-          <input type="text" id="name" placeholder="Votre nom">
-        </div>
-        <div class="form-group">
-          <label for="email">Email</label>
-          <input type="email" id="email" placeholder="Votre email">
-        </div>
-        <div class="form-group">
-          <label for="message">Message</label>
-          <textarea id="message" placeholder="Votre message"></textarea>
-        </div>
-        <button class="btn">Envoyer</button>
+      <div class="contact-info">
+        <p>Vous pouvez me contacter directement sur Discord :</p>
+        <a href="https://discord.com/users/1055134168197103656" class="btn discord-btn">
+          <i class="fab fa-discord"></i> Me contacter sur Discord
+        </a>
+        <p class="discord-username">Mon pseudo Discord : .thozz</p>
       </div>
     </div>
   </section>
@@ -660,15 +660,8 @@
   <footer>
     <div class="container">
       <div class="social-links">
-        <a href="#" class="social-link">
-          <i class="fab fa-discord"></i>
-        </a>
-        <a href="#" class="social-link">
-          <i class="fab fa-github"></i>
-        </a>
-        <a href="#" class="social-link">
-          <i class="fab fa-linkedin"></i>
-        </a>
+        <a href="https://discord.com/users/1055134168197103656" class="social-link"><i class="fa-brands fa-discord"></i></a>
+        <a href="https://github.com/thozz-dev" class="social-link"><i class="fab fa-github"></i></a>
       </div>
       <p>&copy; 2025 .THOZZ - Tous droits réservés</p>
     </div>
@@ -676,7 +669,6 @@
 
   <script>
     document.addEventListener('DOMContentLoaded', function() {
-      // Code Rain Effect
       const codeRainContainer = document.getElementById('code-rain');
       const luaSnippets = [
         "local function OnPlayerLoaded()",
@@ -706,12 +698,10 @@
         const element = document.createElement('div');
         element.classList.add('floating-code');
         element.textContent = snippet;
-        
-        // Random position
+
         const xPos = Math.random() * 100;
         element.style.left = `${xPos}%`;
-        
-        // Random animation duration
+
         const duration = 5 + Math.random() * 10;
         element.style.animationDuration = `${duration}s`;
         
@@ -722,17 +712,14 @@
         }, duration * 1000);
       }
 
-      // Create initial code fragments
       for (let i = 0; i < 20; i++) {
         setTimeout(() => {
           createFloatingCode();
         }, i * 300);
       }
 
-      // Continue spawning code fragments
       setInterval(createFloatingCode, 500);
 
-      // 3D City - FiveM inspired
       const scene = new THREE.Scene();
       const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
       
@@ -744,13 +731,11 @@
         const cityCanvas = document.getElementById('city-canvas');
         cityCanvas.appendChild(renderer.domElement);
 
-        // Add city grid
         const gridSize = 25;
         const gridDivisions = 25;
         const gridHelper = new THREE.GridHelper(gridSize, gridDivisions, 0xff0000, 0x222222);
         scene.add(gridHelper);
-        
-        // Create buildings
+
         const buildings = new THREE.Group();
         
         for (let i = 0; i < 40; i++) {
@@ -765,8 +750,7 @@
           });
           
           const building = new THREE.Mesh(geometry, material);
-          
-          // Position buildings on the grid
+
           building.position.x = (Math.random() - 0.5) * gridSize * 0.8;
           building.position.y = height / 2;
           building.position.z = (Math.random() - 0.5) * gridSize * 0.8;
@@ -774,18 +758,15 @@
           buildings.add(building);
         }
         
-        // Add roads
         const roadMaterial = new THREE.LineBasicMaterial({ color: 0xff0000 });
         
         for (let i = -gridSize/2; i <= gridSize/2; i += 2) {
-          // X-axis roads
           const xRoadGeometry = new THREE.BufferGeometry().setFromPoints([
             new THREE.Vector3(i, 0.01, -gridSize/2),
             new THREE.Vector3(i, 0.01, gridSize/2)
           ]);
           const xRoad = new THREE.Line(xRoadGeometry, roadMaterial);
-          
-          // Z-axis roads
+
           const zRoadGeometry = new THREE.BufferGeometry().setFromPoints([
             new THREE.Vector3(-gridSize/2, 0.01, i),
             new THREE.Vector3(gridSize/2, 0.01, i)
@@ -798,7 +779,6 @@
         
         scene.add(buildings);
         
-        // Moving cars
         const cars = new THREE.Group();
         const carCount = 15;
         const carGeometry = new THREE.BoxGeometry(0.3, 0.2, 0.5);
@@ -823,8 +803,7 @@
         }
         
         scene.add(cars);
-        
-        // Floating code particles
+
         const codeParticles = new THREE.Group();
         const particleCount = 50;
         
@@ -852,29 +831,23 @@
         
         scene.add(codeParticles);
         
-        // Position camera
         camera.position.set(15, 10, 15);
         camera.lookAt(0, 0, 0);
-        
-        // Animation loop
+
         function animate() {
           requestAnimationFrame(animate);
           
-          // Slowly rotate the entire scene
           scene.rotation.y += 0.001;
-          
-          // Animate cars
+
           cars.children.forEach(car => {
             car.position.x += car.userData.direction.x * car.userData.speed;
             car.position.z += car.userData.direction.z * car.userData.speed;
-            
-            // Keep cars within grid bounds
+
             if (Math.abs(car.position.x) > gridSize/2 || Math.abs(car.position.z) > gridSize/2) {
               car.userData.direction.negate();
               car.rotation.y += Math.PI;
             }
-            
-            // Align car to movement direction
+
             car.lookAt(
               car.position.x + car.userData.direction.x,
               car.position.y,
@@ -882,11 +855,9 @@
             );
           });
           
-          // Animate code particles
           codeParticles.children.forEach(particle => {
             particle.position.add(particle.userData.velocity);
-            
-            // Keep particles within bounds
+
             if (Math.abs(particle.position.x) > gridSize/2) {
               particle.userData.velocity.x *= -1;
             }
