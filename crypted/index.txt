@@ -1,0 +1,209 @@
+ document.addEventListener('DOMContentLoaded', function() {
+      const codeRainContainer = document.getElementById('code-rain');
+      const luaSnippets = [
+        "local function OnPlayerLoaded()",
+        "RegisterServerEvent('fivem:playerJoined')",
+        "TriggerClientEvent('notification')",
+        "ESX.RegisterUsableItem('phone')",
+        "function setPlayerData(source, data)",
+        "AddEventHandler('playerDropped')",
+        "MySQL.Async.execute(query)",
+        "exports['es_extended']:getSharedObject()",
+        "RegisterCommand('help', function()",
+        "Citizen.CreateThread(function()",
+        "local vehicle = GetVehiclePedIsIn()",
+        "SetEntityCoords(ped, x, y, z)",
+        "function loadAnimDict(dict)",
+        "TriggerEvent('esx:getSharedObject')",
+        "local xPlayer = ESX.GetPlayerFromId(source)",
+        "local coords = GetEntityCoords(PlayerPedId())",
+        "DrawMarker(1, x, y, z, 0, 0, 0, 0, 0, 0, 1.0, 1.0, 1.0)",
+        "RegisterNetEvent('inventory:open')",
+        "if DoesEntityExist(vehicle) then",
+        "local playerPed = GetPlayerPed(-1)"
+      ];
+
+      function createFloatingCode() {
+        const snippet = luaSnippets[Math.floor(Math.random() * luaSnippets.length)];
+        const element = document.createElement('div');
+        element.classList.add('floating-code');
+        element.textContent = snippet;
+
+        const xPos = Math.random() * 100;
+        element.style.left = `${xPos}%`;
+
+        const duration = 5 + Math.random() * 10;
+        element.style.animationDuration = `${duration}s`;
+        
+        codeRainContainer.appendChild(element);
+        
+        setTimeout(() => {
+          element.remove();
+        }, duration * 1000);
+      }
+
+      for (let i = 0; i < 20; i++) {
+        setTimeout(() => {
+          createFloatingCode();
+        }, i * 300);
+      }
+
+      setInterval(createFloatingCode, 500);
+
+      const scene = new THREE.Scene();
+      const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+      
+      try {
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setClearColor(0x000000, 0);
+        
+        const cityCanvas = document.getElementById('city-canvas');
+        cityCanvas.appendChild(renderer.domElement);
+
+        const gridSize = 25;
+        const gridDivisions = 25;
+        const gridHelper = new THREE.GridHelper(gridSize, gridDivisions, 0xff0000, 0x222222);
+        scene.add(gridHelper);
+
+        const buildings = new THREE.Group();
+        
+        for (let i = 0; i < 40; i++) {
+          const width = 0.5 + Math.random() * 1.5;
+          const height = 1 + Math.random() * 8;
+          const depth = 0.5 + Math.random() * 1.5;
+          
+          const geometry = new THREE.BoxGeometry(width, height, depth);
+          const material = new THREE.MeshBasicMaterial({ 
+            color: i % 5 === 0 ? 0xff0000 : 0x222222,
+            wireframe: true
+          });
+          
+          const building = new THREE.Mesh(geometry, material);
+
+          building.position.x = (Math.random() - 0.5) * gridSize * 0.8;
+          building.position.y = height / 2;
+          building.position.z = (Math.random() - 0.5) * gridSize * 0.8;
+          
+          buildings.add(building);
+        }
+        
+        const roadMaterial = new THREE.LineBasicMaterial({ color: 0xff0000 });
+        
+        for (let i = -gridSize/2; i <= gridSize/2; i += 2) {
+          const xRoadGeometry = new THREE.BufferGeometry().setFromPoints([
+            new THREE.Vector3(i, 0.01, -gridSize/2),
+            new THREE.Vector3(i, 0.01, gridSize/2)
+          ]);
+          const xRoad = new THREE.Line(xRoadGeometry, roadMaterial);
+
+          const zRoadGeometry = new THREE.BufferGeometry().setFromPoints([
+            new THREE.Vector3(-gridSize/2, 0.01, i),
+            new THREE.Vector3(gridSize/2, 0.01, i)
+          ]);
+          const zRoad = new THREE.Line(zRoadGeometry, roadMaterial);
+          
+          scene.add(xRoad);
+          scene.add(zRoad);
+        }
+        
+        scene.add(buildings);
+        
+        const cars = new THREE.Group();
+        const carCount = 15;
+        const carGeometry = new THREE.BoxGeometry(0.3, 0.2, 0.5);
+        const carMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000 });
+        
+        for (let i = 0; i < carCount; i++) {
+          const car = new THREE.Mesh(carGeometry, carMaterial);
+          car.position.set(
+            (Math.random() - 0.5) * gridSize * 0.8,
+            0.1,
+            (Math.random() - 0.5) * gridSize * 0.8
+          );
+          car.userData = {
+            speed: 0.05 + Math.random() * 0.1,
+            direction: new THREE.Vector3(
+              Math.random() - 0.5,
+              0,
+              Math.random() - 0.5
+            ).normalize()
+          };
+          cars.add(car);
+        }
+        
+        scene.add(cars);
+
+        const codeParticles = new THREE.Group();
+        const particleCount = 50;
+        
+        for (let i = 0; i < particleCount; i++) {
+          const geometry = new THREE.SphereGeometry(0.05, 8, 8);
+          const material = new THREE.MeshBasicMaterial({ color: 0xff0000 });
+          const particle = new THREE.Mesh(geometry, material);
+          
+          particle.position.set(
+            (Math.random() - 0.5) * gridSize,
+            Math.random() * 10,
+            (Math.random() - 0.5) * gridSize
+          );
+          
+          particle.userData = {
+            velocity: new THREE.Vector3(
+              (Math.random() - 0.5) * 0.03,
+              (Math.random() - 0.5) * 0.03,
+              (Math.random() - 0.5) * 0.03
+            )
+          };
+          
+          codeParticles.add(particle);
+        }
+        
+        scene.add(codeParticles);
+        
+        camera.position.set(15, 10, 15);
+        camera.lookAt(0, 0, 0);
+
+        function animate() {
+          requestAnimationFrame(animate);
+          
+          scene.rotation.y += 0.001;
+
+          cars.children.forEach(car => {
+            car.position.x += car.userData.direction.x * car.userData.speed;
+            car.position.z += car.userData.direction.z * car.userData.speed;
+
+            if (Math.abs(car.position.x) > gridSize/2 || Math.abs(car.position.z) > gridSize/2) {
+              car.userData.direction.negate();
+              car.rotation.y += Math.PI;
+            }
+
+            car.lookAt(
+              car.position.x + car.userData.direction.x,
+              car.position.y,
+              car.position.z + car.userData.direction.z
+            );
+          });
+          
+          codeParticles.children.forEach(particle => {
+            particle.position.add(particle.userData.velocity);
+
+            if (Math.abs(particle.position.x) > gridSize/2) {
+              particle.userData.velocity.x *= -1;
+            }
+            if (particle.position.y < 0 || particle.position.y > 10) {
+              particle.userData.velocity.y *= -1;
+            }
+            if (Math.abs(particle.position.z) > gridSize/2) {
+              particle.userData.velocity.z *= -1;
+            }
+          });
+          
+          renderer.render(scene, camera);
+        }
+        
+        animate();
+      } catch (error) {
+        console.error("Erreur lors de l'initialisation de la scène 3D:", error);
+      }
+    });
