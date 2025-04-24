@@ -1,0 +1,1182 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Administration - Galerie Portfolio</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        body {
+            background-color: #0a0a0a;
+            color: #fff;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .login-container {
+            width: 100%;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1000;
+            background-color: #0a0a0a;
+            transition: transform 0.5s ease;
+        }
+
+        .login-container.hidden {
+            transform: translateY(-100%);
+        }
+
+        .login-box {
+            width: 350px;
+            padding: 40px;
+            background-color: #1a1a1a;
+            border-radius: 8px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .login-box h2 {
+            margin-bottom: 30px;
+            text-align: center;
+            font-weight: 300;
+            letter-spacing: 1px;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+            color: #aaa;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 10px;
+            background-color: #2a2a2a;
+            border: 1px solid #333;
+            border-radius: 4px;
+            color: #fff;
+            font-size: 1rem;
+        }
+
+        .login-button {
+            width: 100%;
+            padding: 12px;
+            background-color: #333;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .login-button:hover {
+            background-color: #444;
+        }
+
+        .error-message {
+            color: #ff6b6b;
+            font-size: 0.9rem;
+            margin-top: 15px;
+            text-align: center;
+            display: none;
+        }
+
+        header {
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #1a1a1a;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-decoration: none;
+            color: #fff;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 15px;
+        }
+
+        .header-button {
+            background: none;
+            border: 1px solid #555;
+            color: #fff;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 0.9rem;
+        }
+
+        .header-button:hover {
+            background-color: #333;
+            border-color: #777;
+        }
+
+        .header-button.primary {
+            background-color: #444;
+            border-color: #444;
+        }
+
+        .header-button.primary:hover {
+            background-color: #555;
+        }
+
+        main {
+            flex: 1;
+            padding: 40px;
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .page-title {
+            margin-bottom: 30px;
+            font-weight: 300;
+            letter-spacing: 1px;
+            font-size: 2rem;
+        }
+
+        .admin-container {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }
+
+        .admin-section {
+            background-color: #1a1a1a;
+            border-radius: 8px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .admin-section h4 {
+            text-align: justify;
+            margin-bottom: 05px;
+            margin-top: 15px;
+            font-size: 0.9rem;
+        }
+
+        .admin-section p {
+            text-align: justify;
+            margin-bottom: 15px;
+            margin-top: 05px;
+            font-size: 0.9rem;
+        }
+
+        .section-header {
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .section-title {
+            font-size: 1.3rem;
+            font-weight: 400;
+        }
+
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .gallery-item-admin {
+            background-color: #2a2a2a;
+            border-radius: 6px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .gallery-item-admin img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+
+        .gallery-item-info {
+            padding: 15px;
+        }
+
+        .gallery-item-info h3 {
+            font-size: 1rem;
+            margin-bottom: 5px;
+            font-weight: 400;
+        }
+
+        .gallery-item-info p {
+            font-size: 0.85rem;
+            color: #aaa;
+            margin-bottom: 5px;
+        }
+
+        .gallery-item-info .category-badge {
+            display: inline-block;
+            background-color: #333;
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-size: 0.7rem;
+            margin-bottom: 10px;
+        }
+
+        .gallery-item-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .gallery-item-actions button {
+            flex: 1;
+            padding: 6px;
+            font-size: 0.8rem;
+            background-color: #333;
+            border: none;
+            border-radius: 3px;
+            color: #fff;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .gallery-item-actions button:hover {
+            background-color: #444;
+        }
+
+        .gallery-item-actions button.delete {
+            background-color: #5a2a2a;
+        }
+
+        .gallery-item-actions button.delete:hover {
+            background-color: #6e3434;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+            color: #aaa;
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 10px;
+            background-color: #2a2a2a;
+            border: 1px solid #333;
+            border-radius: 4px;
+            color: #fff;
+            font-size: 0.9rem;
+        }
+
+        .form-group textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .form-group.full-width {
+            grid-column: span 2;
+        }
+
+        .admin-button {
+            background-color: #444;
+            color: #fff;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background-color 0.3s;
+        }
+
+        .admin-button:hover {
+            background-color: #555;
+        }
+
+        .import-export {
+            display: flex;
+            gap: 15px;
+        }
+
+        footer {
+            padding: 20px;
+            text-align: center;
+            background-color: #1a1a1a;
+            border-top: 1px solid #2a2a2a;
+        }
+
+        /* Popup pour messages */
+        .admin-popup {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: #333;
+            color: #fff;
+            padding: 10px 20px;
+            border-radius: 4px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+            z-index: 1100;
+            opacity: 0;
+            transform: translateY(-10px);
+            transition: all 0.3s ease;
+        }
+
+        .admin-popup.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .admin-popup.success {
+            background-color: #42b883;
+        }
+
+        .admin-popup.error {
+            background-color: #f44336;
+        }
+
+        .hidden-input {
+            display: none;
+        }
+
+        .file-input {
+            width: 100%;
+            padding: 10px;
+            background-color: #2a2a2a;
+            border: 1px solid #333;
+            border-radius: 4px;
+            color: #fff;
+            font-size: 0.9rem;
+            cursor: pointer;
+        }
+
+        .file-input::-webkit-file-upload-button {
+            background-color: #444;
+            color: #fff;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 3px;
+            cursor: pointer;
+            margin-right: 10px;
+            transition: background-color 0.3s;
+        }
+
+        .file-input::-webkit-file-upload-button:hover {
+            background-color: #555;
+        }
+
+        .image-preview {
+            width: 100%;
+            height: 150px;
+            border-radius: 4px;
+            background-color: #2a2a2a;
+            margin-top: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        .image-preview img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+
+        .no-preview {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .map-container {
+            width: 100%;
+            height: 250px;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 10px;
+            background-color: #2a2a2a;
+        }
+
+        #location-map {
+            width: 100%;
+            height: 100%;
+        }
+
+        .coord-display {
+            background-color: #333;
+            padding: 5px 10px;
+            font-size: 0.8rem;
+            color: #ddd;
+            margin-top: 5px;
+            display: inline-block;
+            border-radius: 3px;
+        }
+
+        .location-help {
+            color: #aaa;
+            font-size: 0.8rem;
+            margin-top: 8px;
+        }
+
+        .location-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .reset-location {
+            background-color: #444;
+            color: #fff;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: background-color 0.3s;
+        }
+
+        .reset-location:hover {
+            background-color: #555;
+        }
+
+        .map-search-control {
+            margin-bottom: 10px;
+            display: flex;
+        }
+
+        .map-search-control input {
+            flex: 1;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px 0 0 4px;
+        }
+
+        .map-search-control button {
+            padding: 8px 12px;
+            background-color: #4CAF50;
+            border: none;
+            color: white;
+            border-radius: 0 4px 4px 0;
+            cursor: pointer;
+        }
+
+        .map-search-control button:hover {
+            background-color: #45a049;
+        }
+    </style>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100;200;300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" />
+</head>
+
+<body>
+    <!-- Écran de connexion -->
+    <div class="login-container" id="login-screen">
+        <div class="login-box">
+            <h2>Accès Administration</h2>
+            <div class="input-group">
+                <label for="username">Identifiant</label>
+                <input type="text" id="username" placeholder="Votre identifiant">
+            </div>
+            <div class="input-group">
+                <label for="password">Mot de passe</label>
+                <input type="password" id="password" placeholder="Votre mot de passe">
+            </div>
+            <button class="login-button" id="login-btn">Se connecter</button>
+            <p class="error-message" id="login-error">Identifiant ou mot de passe incorrect</p>
+        </div>
+    </div>
+
+    <!-- Interface d'administration -->
+    <header>
+        <a href="#" class="logo">PORTFOLIO ADMIN</a>
+        <div class="header-actions">
+            <a href="index.html" class="header-button">Voir le site</a>
+            <button class="header-button primary" id="logout-btn">Déconnexion</button>
+        </div>
+    </header>
+
+    <main>
+        <h1 class="page-title">Gestion de la Galerie</h1>
+
+        <div class="admin-container">
+            <section class="admin-section">
+                <div class="section-header">
+                    <h2 class="section-title">Ajouter une image</h2>
+                </div>
+
+                <form id="add-image-form">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="image-title">Titre</label>
+                            <input type="text" id="image-title" placeholder="Titre de l'image" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="image-category">Catégorie</label>
+                            <select id="image-category" required>
+                                <option value="nature">Nature</option>
+                                <option value="portrait">Portrait</option>
+                                <option value="urban">Urbain</option>
+                                <option value="abstract">Abstrait</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group full-width">
+                            <label for="image-description">Description</label>
+                            <textarea id="image-description" placeholder="Description de l'image" required></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="thumbnail-upload">Miniature (JPG, PNG)</label>
+                            <input type="file" id="thumbnail-upload" accept=".jpg,.jpeg,.png" class="file-input">
+                            <div class="image-preview" id="thumbnail-preview">
+                                <span class="no-preview">Aperçu de la miniature</span>
+                            </div>
+                            <input type="hidden" id="image-thumbnail-data">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="full-image-upload">Image complète (JPG, PNG)</label>
+                            <input type="file" id="full-image-upload" accept=".jpg,.jpeg,.png" class="file-input">
+                            <div class="image-preview" id="full-preview">
+                                <span class="no-preview">Aperçu de l'image complète</span>
+                            </div>
+                            <input type="hidden" id="image-full-data">
+                        </div>
+
+                        <div class="form-group full-width">
+                            <div class="location-header">
+                                <label for="location-map">Localisation</label>
+                                <button type="button" id="reset-location" class="reset-location">Réinitialiser</button>
+                            </div>
+                            <div class="map-container">
+                                <div id="location-map"></div>
+                            </div>
+                            <div class="coord-display" id="coord-display">Aucune localisation sélectionnée</div>
+                            <input type="hidden" id="image-location-lat">
+                            <input type="hidden" id="image-location-lng">
+                            <p class="location-help">Cliquez sur la carte pour définir l'emplacement où la photo a été
+                                prise. Cette information sera utilisée pour afficher la photo sur la carte.</p>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="admin-button">Ajouter l'image</button>
+                </form>
+
+                <div class="css-protection-notice">
+                    <h4>Protection de la galerie</h4>
+                    <p>Les images ajoutées à la galerie seront automatiquement protégées contre la copie et le
+                        téléchargement sur la page d'accueil.</p>
+                </div>
+            </section>
+
+            <section class="admin-section">
+                <div class="section-header">
+                    <h2 class="section-title">Images de la galerie</h2>
+                    <div class="import-export">
+                        <button id="export-gallery" class="header-button">Exporter la galerie</button>
+                        <button id="import-gallery" class="header-button">Importer une galerie</button>
+                        <input type="file" id="import-file" class="hidden-input" accept=".json">
+                    </div>
+                </div>
+
+                <div class="gallery-grid" id="admin-gallery-list">
+                    <!-- Les images de la galerie seront ajoutées ici dynamiquement -->
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 Portfolio Photographique - Interface d'administration</p>
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const LOGIN_USERNAME = "admin";
+            const LOGIN_PASSWORD = "portfolio2025";
+
+            const loginScreen = document.getElementById('login-screen');
+            const loginBtn = document.getElementById('login-btn');
+            const loginError = document.getElementById('login-error');
+            const logoutBtn = document.getElementById('logout-btn');
+
+            function checkLoginState() {
+                const isLoggedIn = sessionStorage.getItem('isLoggedIn') === 'true';
+                if (isLoggedIn) {
+                    loginScreen.classList.add('hidden');
+                } else {
+                    loginScreen.classList.remove('hidden');
+                }
+            }
+
+            loginBtn.addEventListener('click', () => {
+                const username = document.getElementById('username').value;
+                const password = document.getElementById('password').value;
+
+                if (username === LOGIN_USERNAME && password === LOGIN_PASSWORD) {
+                    sessionStorage.setItem('isLoggedIn', 'true');
+                    loginScreen.classList.add('hidden');
+                    loginError.style.display = 'none';
+                    initAdminInterface();
+                } else {
+                    loginError.style.display = 'block';
+                    sessionStorage.removeItem('isLoggedIn');
+                }
+            });
+
+            logoutBtn.addEventListener('click', () => {
+                sessionStorage.removeItem('isLoggedIn');
+                loginScreen.classList.remove('hidden');
+            });
+
+            function initAdminInterface() {
+                let galleryItems = JSON.parse(localStorage.getItem('galleryItems')) || [];
+                const addImageForm = document.getElementById('add-image-form');
+                const thumbnailInput = document.getElementById('image-thumbnail');
+                const fullImageInput = document.getElementById('image-full');
+                const thumbnailPreview = document.getElementById('thumbnail-preview');
+                const fullPreview = document.getElementById('full-preview');
+                const galleryList = document.getElementById('admin-gallery-list');
+                const exportBtn = document.getElementById('export-gallery');
+                const importBtn = document.getElementById('import-gallery');
+                const importFile = document.getElementById('import-file');
+                let thumbnailUpload = document.getElementById('thumbnail-upload');
+                let fullImageUpload = document.getElementById('full-image-upload');
+                let thumbnailDataInput = document.getElementById('image-thumbnail-data');
+                let fullImageDataInput = document.getElementById('image-full-data');
+
+                setTimeout(() => {
+                    initLocationMap();
+                }, 500);
+
+                if (thumbnailUpload && fullImageUpload) {
+                    thumbnailUpload.addEventListener('change', function (e) {
+                        handleImageUpload(e.target.files[0], thumbnailPreview, thumbnailDataInput);
+                    });
+
+                    fullImageUpload.addEventListener('change', function (e) {
+                        handleImageUpload(e.target.files[0], fullPreview, fullImageDataInput);
+                    });
+                }
+
+                function initLocationMap() {
+                    if (typeof L === 'undefined') {
+                        console.error('Leaflet n\'est pas chargé');
+                        return;
+                    }
+
+                    const mapElement = document.getElementById('location-map');
+                    if (!mapElement) {
+                        console.error('Élément de carte avec ID "location-map" non trouvé');
+                        return;
+                    }
+
+                    try {
+                        if (mapElement._leaflet_id) {
+                            console.log('Carte déjà initialisée');
+                            return;
+                        }
+                    } catch (e) {
+                        console.log('Première initialisation de la carte');
+                    }
+
+                    mapElement.style.height = mapElement.style.height || '400px';
+
+                    try {
+                        const map = L.map('location-map').setView([46.603354, 1.888334], 5);
+
+                        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                        }).addTo(map);
+
+                        let marker;
+
+                        const latInput = document.getElementById('image-latitude');
+                        const lngInput = document.getElementById('image-longitude');
+
+                        function updateMarker(lat, lng) {
+                            if (isNaN(lat) || isNaN(lng)) {
+                                console.log('Coordonnées invalides:', lat, lng);
+                                return;
+                            }
+
+                            console.log('Mise à jour du marqueur:', lat, lng);
+
+                            if (marker) {
+                                map.removeLayer(marker);
+                            }
+
+                            marker = L.marker([lat, lng]).addTo(map);
+
+                            map.setView([lat, lng], 10);
+
+                            if (latInput && lngInput) {
+                                latInput.value = lat.toFixed(6);
+                                lngInput.value = lng.toFixed(6);
+                                console.log('Valeurs des champs mises à jour:', latInput.value, lngInput.value);
+                            }
+                        }
+
+                        map.on('click', function (e) {
+                            console.log('Clic sur la carte:', e.latlng.lat, e.latlng.lng);
+                            updateMarker(e.latlng.lat, e.latlng.lng);
+                        });
+
+                        if (latInput && lngInput) {
+                            latInput.addEventListener('input', function () {
+                                const lat = parseFloat(latInput.value);
+                                const lng = parseFloat(lngInput.value);
+
+                                if (!isNaN(lat) && !isNaN(lng)) {
+                                    updateMarker(lat, lng);
+                                }
+                            });
+
+                            lngInput.addEventListener('input', function () {
+                                const lat = parseFloat(latInput.value);
+                                const lng = parseFloat(lngInput.value);
+
+                                if (!isNaN(lat) && !isNaN(lng)) {
+                                    updateMarker(lat, lng);
+                                }
+                            });
+
+                            const lat = parseFloat(latInput.value);
+                            const lng = parseFloat(lngInput.value);
+
+                            if (!isNaN(lat) && !isNaN(lng)) {
+                                updateMarker(lat, lng);
+                            }
+                        }
+
+                        setTimeout(() => {
+                            window.dispatchEvent(new Event('resize'));
+                            map.invalidateSize();
+                        }, 100);
+
+                        try {
+                            const searchControl = document.createElement('div');
+                            searchControl.className = 'map-search-control';
+                            searchControl.innerHTML = `
+                <input type="text" id="address-search" placeholder="Rechercher une adresse...">
+                <button id="search-btn">Rechercher</button>
+            `;
+
+                            const formGroup = document.querySelector('.form-group') || mapElement.parentNode;
+                            if (formGroup) {
+                                formGroup.insertBefore(searchControl, mapElement);
+
+                                document.getElementById('search-btn').addEventListener('click', function () {
+                                    const address = document.getElementById('address-search').value;
+                                    if (address) {
+                                        fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}`)
+                                            .then(response => response.json())
+                                            .then(data => {
+                                                if (data && data.length > 0) {
+                                                    const lat = parseFloat(data[0].lat);
+                                                    const lng = parseFloat(data[0].lon);
+                                                    updateMarker(lat, lng);
+                                                } else {
+                                                    alert('Adresse non trouvée');
+                                                }
+                                            })
+                                            .catch(err => {
+                                                console.error('Erreur de géocodage:', err);
+                                                alert('Erreur lors de la recherche de l\'adresse');
+                                            });
+                                    }
+                                });
+
+                                document.getElementById('address-search').addEventListener('keypress', function (e) {
+                                    if (e.key === 'Enter') {
+                                        document.getElementById('search-btn').click();
+                                        e.preventDefault();
+                                    }
+                                });
+                            }
+                        } catch (searchError) {
+                            console.error('Erreur lors de l\'ajout du contrôle de recherche:', searchError);
+                        }
+
+                        console.log('Carte initialisée avec succès');
+                        return map;
+
+                    } catch (error) {
+                        console.error('Erreur lors de l\'initialisation de la carte:', error);
+                    }
+                }
+
+                function handleImageUpload(file, previewElement, dataInput) {
+                    if (!file) return;
+
+                    if (!file.type.match('image/jpeg') && !file.type.match('image/png')) {
+                        showPopup('Seules les images JPG et PNG sont acceptées', 'error');
+                        return;
+                    }
+
+                    if (file.size > 5 * 1024 * 1024) {
+                        showPopup('L\'image est trop volumineuse (max 5MB)', 'error');
+                        return;
+                    }
+
+                    const reader = new FileReader();
+                    reader.onload = function (e) {
+                        const dataURL = e.target.result;
+                        previewElement.innerHTML = `<img src="${dataURL}" alt="Prévisualisation">`;
+                        dataInput.value = dataURL;
+                    };
+                    reader.readAsDataURL(file);
+                }
+
+                function addUploadFields() {
+                    const thumbnailGroup = document.querySelector('.form-group:has(#image-thumbnail)');
+                    if (thumbnailGroup) {
+                        const uploadInput = document.createElement('input');
+                        uploadInput.type = 'file';
+                        uploadInput.id = 'thumbnail-upload';
+                        uploadInput.accept = '.jpg,.jpeg,.png';
+                        uploadInput.className = 'file-input';
+                        const dataInput = document.createElement('input');
+                        dataInput.type = 'hidden';
+                        dataInput.id = 'image-thumbnail-data';
+                        thumbnailGroup.insertBefore(uploadInput, thumbnailInput);
+                        thumbnailGroup.appendChild(dataInput);
+                        uploadInput.addEventListener('change', function (e) {
+                            handleImageUpload(e.target.files[0], thumbnailPreview, dataInput);
+                        });
+                    }
+
+                    const fullImageGroup = document.querySelector('.form-group:has(#image-full)');
+                    if (fullImageGroup) {
+                        const uploadInput = document.createElement('input');
+                        uploadInput.type = 'file';
+                        uploadInput.id = 'full-image-upload';
+                        uploadInput.accept = '.jpg,.jpeg,.png';
+                        uploadInput.className = 'file-input';
+                        const dataInput = document.createElement('input');
+                        dataInput.type = 'hidden';
+                        dataInput.id = 'image-full-data';
+                        fullImageGroup.insertBefore(uploadInput, fullImageInput);
+                        fullImageGroup.appendChild(dataInput);
+                        uploadInput.addEventListener('change', function (e) {
+                            handleImageUpload(e.target.files[0], fullPreview, dataInput);
+                        });
+                    }
+                }
+
+                function updateThumbnailPreview() {
+                    const url = thumbnailInput.value.trim();
+                    if (url) {
+                        thumbnailPreview.innerHTML = `<img src="${url}" alt="Prévisualisation" onerror="this.parentNode.innerHTML='<span class=\\'no-preview\\'>URL invalide</span>'">`;
+                    } else {
+                        thumbnailPreview.innerHTML = '<span class="no-preview">Aperçu de la miniature</span>';
+                    }
+                }
+
+                function updateFullPreview() {
+                    const url = fullImageInput.value.trim();
+                    if (url) {
+                        fullPreview.innerHTML = `<img src="${url}" alt="Prévisualisation" onerror="this.parentNode.innerHTML='<span class=\\'no-preview\\'>URL invalide</span>'">`;
+                    } else {
+                        fullPreview.innerHTML = '<span class="no-preview">Aperçu de l\'image complète</span>';
+                    }
+                }
+
+                addImageForm.addEventListener('submit', (e) => {
+                    e.preventDefault();
+
+                    const title = document.getElementById('image-title').value;
+                    const description = document.getElementById('image-description').value;
+                    const category = document.getElementById('image-category').value;
+
+                    const thumbnail = thumbnailDataInput.value || thumbnailInput.value;
+                    const fullImage = fullImageDataInput.value || fullImageInput.value;
+
+                    const latitudeInput = document.getElementById('image-latitude');
+                    const longitudeInput = document.getElementById('image-longitude');
+
+                    const latitude = latitudeInput ? parseFloat(latitudeInput.value) : NaN;
+                    const longitude = longitudeInput ? parseFloat(longitudeInput.value) : NaN;
+                    const geoLocation = (!isNaN(latitude) && !isNaN(longitude)) ? [latitude, longitude] : null;
+
+                    if (!thumbnail || !fullImage) {
+                        showPopup('Veuillez ajouter les deux images requises', 'error');
+                        return;
+                    }
+
+                    if (document.querySelector('#add-image-form button[type="submit"]').dataset.editing) {
+                        return;
+                    }
+
+                    const newImage = {
+                        id: Date.now(),
+                        category,
+                        title,
+                        description,
+                        thumbnail,
+                        fullImage,
+                        geoLocation
+                    };
+
+                    galleryItems.push(newImage);
+                    saveGallery();
+                    renderGalleryItems();
+                    addImageForm.reset();
+                    thumbnailPreview.innerHTML = '<span class="no-preview">Aperçu de la miniature</span>';
+                    fullPreview.innerHTML = '<span class="no-preview">Aperçu de l\'image complète</span>';
+                    thumbnailDataInput.value = '';
+                    fullImageDataInput.value = '';
+
+                    if (itemToEdit.geoLocation && Array.isArray(itemToEdit.geoLocation) && itemToEdit.geoLocation.length === 2) {
+                        document.getElementById('image-latitude').value = itemToEdit.geoLocation[0];
+                        document.getElementById('image-longitude').value = itemToEdit.geoLocation[1];
+                    } else {
+                        document.getElementById('image-latitude').value = '';
+                        document.getElementById('image-longitude').value = '';
+                    }
+                    console.log(geoLocation);
+
+                    showPopup('Image ajoutée avec succès', 'success');
+                });
+
+                exportBtn.addEventListener('click', () => {
+                    const dataStr = JSON.stringify(galleryItems, null, 2);
+                    const dataBlob = new Blob([dataStr], { type: 'application/json' });
+                    const url = URL.createObjectURL(dataBlob);
+
+                    const link = document.createElement('a');
+                    link.href = url;
+                    link.download = 'galerie-portfolio.json';
+                    link.click();
+
+                    showPopup('Galerie exportée avec succès', 'success');
+                });
+
+                importBtn.addEventListener('click', () => {
+                    importFile.click();
+                });
+
+                importFile.addEventListener('change', (e) => {
+                    const file = e.target.files[0];
+                    if (!file) return;
+
+                    const reader = new FileReader();
+                    reader.onload = function (event) {
+                        try {
+                            const importedData = JSON.parse(event.target.result);
+                            if (Array.isArray(importedData)) {
+                                galleryItems = importedData;
+                                saveGallery();
+                                renderGalleryItems();
+                                showPopup('Galerie importée avec succès', 'success');
+                            } else {
+                                throw new Error('Format de fichier invalide');
+                            }
+                        } catch (error) {
+                            showPopup('Erreur lors de l\'importation: ' + error.message, 'error');
+                        }
+                    };
+                    reader.readAsText(file);
+                });
+
+                function renderGalleryItems() {
+                    galleryList.innerHTML = '';
+
+                    if (galleryItems.length === 0) {
+                        galleryList.innerHTML = '<p>Aucune image dans la galerie pour le moment.</p>';
+                        return;
+                    }
+
+                    galleryItems.forEach(item => {
+                        const itemElement = document.createElement('div');
+                        itemElement.className = 'gallery-item-admin';
+                        itemElement.innerHTML = `
+                            <img src="${item.thumbnail}" alt="${item.title}" onerror="this.src='/api/placeholder/300/200'">
+                            ${item.geoLocation ? '<span class="has-location">Position GPS</span>' : ''}
+                            <div class="gallery-item-info">
+                                <span class="category-badge">${getCategoryName(item.category)}</span>
+                                <h3>${item.title}</h3>
+                                <p>${item.description.substring(0, 60)}${item.description.length > 60 ? '...' : ''}</p>
+                                <div class="gallery-item-actions">
+                                    <button class="edit-item" data-id="${item.id}">Modifier</button>
+                                    <button class="delete delete-item" data-id="${item.id}">Supprimer</button>
+                                </div>
+                            </div>
+                        `;
+                        galleryList.appendChild(itemElement);
+                    });
+
+                    document.querySelectorAll('.delete-item').forEach(btn => {
+                        btn.addEventListener('click', (e) => {
+                            const idToRemove = parseInt(e.target.dataset.id);
+                            if (confirm('Êtes-vous sûr de vouloir supprimer cette image ?')) {
+                                galleryItems = galleryItems.filter(item => item.id !== idToRemove);
+                                saveGallery();
+                                renderGalleryItems();
+                                showPopup('Image supprimée', 'success');
+                            }
+                        });
+                    });
+
+                    document.querySelectorAll('.edit-item').forEach(btn => {
+                        btn.addEventListener('click', (e) => {
+                            const idToEdit = parseInt(e.target.dataset.id);
+                            const itemToEdit = galleryItems.find(item => item.id === idToEdit);
+
+                            if (itemToEdit) {
+                                document.getElementById('image-title').value = itemToEdit.title;
+                                document.getElementById('image-description').value = itemToEdit.description;
+                                document.getElementById('image-category').value = itemToEdit.category;
+                                thumbnailPreview.innerHTML = `<img src="${itemToEdit.thumbnail}" alt="Prévisualisation">`;
+                                fullPreview.innerHTML = `<img src="${itemToEdit.fullImage}" alt="Prévisualisation">`;
+                                thumbnailDataInput.value = itemToEdit.thumbnail;
+                                fullImageDataInput.value = itemToEdit.fullImage;
+
+                                document.getElementById('add-image-form').scrollIntoView({ behavior: 'smooth' });
+                                const submitBtn = document.querySelector('#add-image-form button[type="submit"]');
+                                submitBtn.textContent = 'Mettre à jour l\'image';
+                                submitBtn.dataset.editing = idToEdit;
+
+                                const originalSubmitHandler = addImageForm.onsubmit;
+                                addImageForm.onsubmit = function (e) {
+                                    e.preventDefault();
+
+                                    const title = document.getElementById('image-title').value;
+                                    const description = document.getElementById('image-description').value;
+                                    const category = document.getElementById('image-category').value;
+                                    const thumbnail = thumbnailDataInput.value;
+                                    const fullImage = fullImageDataInput.value;
+
+                                    const latitudeInput = document.getElementById('image-latitude');
+                                    const longitudeInput = document.getElementById('image-longitude');
+
+                                    const latitude = latitudeInput ? parseFloat(latitudeInput.value) : NaN;
+                                    const longitude = longitudeInput ? parseFloat(longitudeInput.value) : NaN;
+                                    const geoLocation = (!isNaN(latitude) && !isNaN(longitude)) ? [latitude, longitude] : null;
+
+                                    if (!thumbnail || !fullImage) {
+                                        showPopup('Veuillez ajouter les deux images requises', 'error');
+                                        return;
+                                    }
+
+                                    const index = galleryItems.findIndex(item => item.id === idToEdit);
+                                    if (index !== -1) {
+                                        galleryItems[index] = {
+                                            ...galleryItems[index],
+                                            title,
+                                            description,
+                                            category,
+                                            thumbnail,
+                                            fullImage,
+                                            geoLocation
+                                        };
+
+                                        saveGallery();
+                                        renderGalleryItems();
+                                        addImageForm.reset();
+                                        thumbnailPreview.innerHTML = '<span class="no-preview">Aperçu de la miniature</span>';
+                                        fullPreview.innerHTML = '<span class="no-preview">Aperçu de l\'image complète</span>';
+                                        thumbnailDataInput.value = '';
+                                        fullImageDataInput.value = '';
+                                        submitBtn.textContent = 'Ajouter l\'image';
+                                        delete submitBtn.dataset.editing;
+                                        addImageForm.onsubmit = originalSubmitHandler;
+
+                                        if (itemToEdit.geoLocation && Array.isArray(itemToEdit.geoLocation) && itemToEdit.geoLocation.length === 2) {
+                                            document.getElementById('image-latitude').value = itemToEdit.geoLocation[0];
+                                            document.getElementById('image-longitude').value = itemToEdit.geoLocation[1];
+                                        } else {
+                                            document.getElementById('image-latitude').value = '';
+                                            document.getElementById('image-longitude').value = '';
+                                        }
+                                        console.log(geoLocation);
+
+                                        showPopup('Image mise à jour avec succès', 'success');
+                                    }
+                                };
+                            }
+                        });
+                    });
+                }
+
+                function getCategoryName(categoryCode) {
+                    const categories = {
+                        'nature': 'Nature',
+                        'portrait': 'Portrait',
+                        'urban': 'Urbain',
+                        'abstract': 'Abstrait'
+                    };
+                    return categories[categoryCode] || categoryCode;
+                }
+
+                function saveGallery() {
+                    localStorage.setItem('galleryItems', JSON.stringify(galleryItems));
+                }
+
+                function showPopup(message, type = 'success') {
+                    const existingPopup = document.querySelector('.admin-popup');
+                    if (existingPopup) existingPopup.remove();
+                    const popup = document.createElement('div');
+                    popup.className = `admin-popup ${type}`;
+                    popup.textContent = message;
+
+                    document.body.appendChild(popup);
+                    setTimeout(() => {
+                        popup.classList.add('show');
+                    }, 10);
+                    setTimeout(() => {
+                        popup.classList.remove('show');
+                        setTimeout(() => {
+                            popup.remove();
+                        }, 300);
+                    }, 3000);
+                }
+                renderGalleryItems();
+            }
+            checkLoginState();
+            if (sessionStorage.getItem('isLoggedIn') === 'true') {
+                initAdminInterface();
+            }
+        });
+    </script>
+</body>
+
+</html>
