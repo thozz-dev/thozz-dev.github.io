@@ -1611,15 +1611,11 @@
 
         function initializeGalleryData() {
             try {
-                // Essayer d'abord de charger depuis le localStorage
-                const storedItems = localStorage.getItem('galleryItems');
-                let items = storedItems ? JSON.parse(storedItems) : null;
-                
-                // Si pas de données dans le localStorage ou données invalides, charger depuis gallery.json
+                const items = window.galleryItems;
+
                 if (!items || !Array.isArray(items) || items.length === 0) {
                     console.log('Chargement des données depuis gallery.json...');
-                    
-                    // Déterminer le chemin de base pour GitHub Pages
+
                     const basePath = window.location.hostname.includes('github.io') 
                         ? window.location.pathname.split('/').slice(0, -1).join('/') 
                         : '';
@@ -1638,7 +1634,6 @@
                         .then(data => {
                             console.log('Données reçues:', data);
                             if (data && data.items && Array.isArray(data.items)) {
-                                // Mettre à jour les chemins des images pour GitHub Pages
                                 const updatedItems = data.items.map(item => ({
                                     ...item,
                                     thumbnail: `${basePath}/${item.thumbnail}`,
@@ -1648,8 +1643,6 @@
                                 window.galleryItems = updatedItems;
                                 localStorage.setItem('galleryItems', JSON.stringify(updatedItems));
                                 console.log(`${updatedItems.length} images chargées depuis gallery.json`);
-                                
-                                // Forcer le rechargement de la galerie
                                 loadGallery('all');
                             } else {
                                 console.error('Format de données invalide:', data);
@@ -1658,7 +1651,6 @@
                         })
                         .catch(error => {
                             console.error('Erreur lors du chargement de gallery.json:', error);
-                            // Fallback sur les données par défaut avec chemins absolus
                             window.galleryItems = [
                                 {
                                     id: 1,
@@ -1681,8 +1673,6 @@
                             ];
                             localStorage.setItem('galleryItems', JSON.stringify(window.galleryItems));
                             console.log('Utilisation des données par défaut');
-                            
-                            // Forcer le rechargement de la galerie
                             loadGallery('all');
                         });
                 } else {
@@ -1690,12 +1680,9 @@
                     window.galleryItems = items;
                     console.log(`${items.length} images chargées depuis le localStorage`);
                 }
-                
-                // Initialiser les items filtrés et l'index courant
+
                 window.filteredItems = Array.isArray(window.galleryItems) ? [...window.galleryItems] : [];
                 window.currentIndex = 0;
-                
-                // Précharger les images
                 preloadImagesWithErrorHandling();
                 
             } catch (error) {
