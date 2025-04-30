@@ -1,0 +1,32 @@
+{
+  "version": "1.0",
+  "lastModified": "2024-03-20T12:00:00Z",
+  "items": [
+    {
+      "id": 1,
+      "category": "nature",
+      "title": "Cascade Mystique",
+      "description": "Eau cristalline tombant sur des rochers moussus",
+      "thumbnail": "images/2.jpg",
+      "fullImage": "images/2.jpg",
+      "geoLocation": [45.8992, 6.1294],
+      "tags": ["montagne", "coucher de soleil", "nature"],
+      "exif": {
+        "camera": "Canon EOS R5",
+        "lens": "24-70mm f/2.8",
+        "focalLength": "50mm",
+        "aperture": "f/4.0",
+        "shutterSpeed": "1/250s",
+        "iso": "400"
+      },
+      "notes": "Photo prise lors d'une randonnée matinale",
+      "createdAt": "2024-03-20T10:00:00Z",
+      "modifiedAt": "2024-03-20T10:00:00Z"
+    }
+  ],
+  "settings": {
+    "language": "fr",
+    "theme": "dark",
+    "galleryView": "mosaic"
+  }
+} 

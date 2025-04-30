@@ -161,7 +161,11 @@
         .hamburger {
             display: none;
             cursor: pointer;
+            font-size: 1.5rem;
             color: var(--text-color);
+            background: none;
+            border: none;
+            z-index: 1000;
         }
 
         .categories {
@@ -217,26 +221,124 @@
         }
 
         .gallery {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            grid-auto-rows: 300px;
-            grid-auto-flow: dense;
-            gap: 25px;
-            padding: 0 40px;
-            opacity: 0;
-            transform: translateY(20px);
-            animation: fadeIn 1s ease forwards;
+            columns: 4;
+            column-gap: 10px;
+            padding: 10px;
             max-width: 1800px;
             margin: 0 auto;
+            opacity: 0;
+            animation: fadeIn 1s ease forwards;
+        }
+
+        @media (max-width: 1200px) {
+            .gallery {
+                columns: 3;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .gallery {
+                columns: 2;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .gallery {
+                columns: 1;
+            }
         }
 
         .gallery-item {
-            overflow: hidden;
             position: relative;
+            width: 100%;
+            margin-bottom: 10px;
+            break-inside: avoid;
             border-radius: 8px;
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
             cursor: pointer;
-            transition: transform 0.4s ease, box-shadow 0.4s ease;
+            background: var(--bg-color);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .gallery-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+        }
+
+        .gallery-item img {
+            width: 100%;
+            max-height: 250px;
+            height: auto;
+            display: block;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+
+        .gallery-item:hover img {
+            transform: scale(1.05);
+        }
+
+        .gallery-item-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 20px;
+            background: linear-gradient(
+                to top,
+                rgba(0, 0, 0, 0.8) 0%,
+                rgba(0, 0, 0, 0.6) 50%,
+                transparent 100%
+            );
+            color: white;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.3s ease;
+        }
+
+        .gallery-item:hover .gallery-item-overlay {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .gallery-item-title {
+            font-size: 1.1rem;
+            font-weight: 500;
+            margin-bottom: 5px;
+            color: white;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+        }
+
+        .gallery-item-desc {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.9);
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .gallery-item.loading {
+            filter: blur(10px);
+            transform: scale(0.95);
+        }
+
+        .gallery-item.loaded {
+            filter: blur(0);
+            transform: scale(1);
         }
 
         .gallery-item.wide {
@@ -252,68 +354,79 @@
             grid-row: span 2;
         }
 
-        .gallery-item img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            transition: transform 0.7s ease;
+        @media (max-width: 1800px) {
+            .gallery-item img {
+                height: 200px;
+            }
         }
 
-        .gallery-item:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+        @media (max-width: 1200px) {
+            .gallery {
+                grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+                grid-auto-rows: 300px;
+                gap: 15px;
+                padding: 15px;
+            }
+
+            .gallery-item img {
+                height: 200px;
+            }
         }
 
-        .gallery-item:hover img {
-            transform: scale(1.08);
+        @media (max-width: 768px) {
+            .gallery {
+                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+                grid-auto-rows: 250px;
+                gap: 12px;
+                padding: 12px;
+            }
+
+            .gallery-item img {
+                height: 150px;
+            }
+
+            .gallery-item.wide,
+            .gallery-item.tall,
+            .gallery-item.large {
+                grid-column: span 1;
+                grid-row: span 1;
+            }
+
+            .gallery-item-overlay {
+                padding: 20px 15px;
+            }
+
+            .gallery-item-title {
+                font-size: 1.1rem;
+            }
+
+            .gallery-item-desc {
+                font-size: 0.85rem;
+            }
         }
 
-        .gallery-item-overlay {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            padding: 30px 20px 20px;
-            background: linear-gradient(to top, var(--overlay-color) 0%, rgba(0, 0, 0, 0.4) 60%, transparent 100%);
-            opacity: 0;
-            transform: translateY(20px);
-            transition: opacity 0.4s ease, transform 0.4s ease;
-        }
+        @media (max-width: 480px) {
+            .gallery {
+                grid-template-columns: 1fr;
+                grid-auto-rows: 280px;
+                gap: 10px;
+                padding: 10px;
+            }
 
-        .gallery-item:hover .gallery-item-overlay {
-            opacity: 1;
-            transform: translateY(0);
-        }
+            .gallery-item img {
+                height: 10px;
+            }
 
-        .gallery-item-title {
-            font-size: 1.1rem;
-            margin-bottom: 8px;
-            font-weight: 500;
-            letter-spacing: 0.5px;
-            position: relative;
-            padding-bottom: 8px;
-        }
-
-        .gallery-item-title::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 40px;
-            height: 2px;
-            background-color: var(--text-color);
-            transition: width 0.3s ease;
-        }
-
-        .gallery-item:hover .gallery-item-title::after {
-            width: 60px;
-        }
-
-        .gallery-item-desc {
-            font-size: 0.85rem;
-            color: #ddd;
-            font-weight: 300;
-            line-height: 1.4;
+            .gallery-item-overlay {
+                opacity: 1;
+                transform: translateY(0);
+                background: linear-gradient(
+                    to top,
+                    rgba(0, 0, 0, 0.9) 0%,
+                    rgba(0, 0, 0, 0.7) 50%,
+                    rgba(0, 0, 0, 0.3) 100%
+                );
+            }
         }
 
         .modal {
@@ -449,15 +562,7 @@
             border-top: 1px solid #222;
         }
 
-        @keyframes fadeIn {
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
         @keyframes bounce {
-
             0%,
             20%,
             50%,
@@ -535,7 +640,6 @@
             position: relative;
             border-radius: 8px;
             overflow: hidden;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
             height: 400px;
         }
 
@@ -815,13 +919,13 @@
 
         @media (max-width: 992px) {
             .map-container {
-                width: 50%;
+                width: 95%;
             }
         }
 
         @media (max-width: 768px) {
             .map-container {
-                width: 80%;
+                width: 95%;
             }
         }
 
@@ -894,51 +998,145 @@
 
         @media (max-width: 768px) {
             h1 {
-                font-size: 3rem;
+                font-size: 2.5rem;
             }
 
-            .menu {
-                position: fixed;
-                top: 0;
-                right: -100%;
-                height: 100vh;
-                width: 70%;
-                max-width: 300px;
-                background-color: var(--bg-color);
-                flex-direction: column;
-                justify-content: center;
-                align-items: center;
-                transition: right 0.3s ease;
-            }
-
-            .menu.active {
-                right: 0;
-            }
-
-            .hamburger {
-                display: block;
-                z-index: 101;
+            .header-content p {
+                font-size: 1rem;
+                padding: 0 20px;
             }
 
             .gallery {
                 grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-                padding: 0 20px;
+                padding: 0 15px;
+                gap: 15px;
+            }
+
+            .gallery-item.wide,
+            .gallery-item.tall,
+            .gallery-item.large {
+                grid-column: span 1;
+                grid-row: span 1;
+            }
+
+            .gallery-item-overlay {
+                padding: 20px 15px;
+            }
+
+            .gallery-item-title {
+                font-size: 1rem;
+            }
+
+            .gallery-item-desc {
+                font-size: 0.8rem;
+            }
+
+            .focus-mode .focus-container {
+                flex-direction: column;
+                height: auto;
+                max-height: 90vh;
+            }
+
+            .focus-image-container {
+                height: 50vh;
+                margin-right: 0;
+            }
+
+            .focus-details {
+                height: auto;
+                max-height: 40vh;
+                padding: 20px;
+            }
+
+            .exif-data {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 10px;
+            }
+
+            .exif-item {
+                padding: 8px;
+            }
+
+            .exif-label {
+                font-size: 0.7rem;
+            }
+
+            .exif-value {
+                font-size: 1rem;
             }
 
             .about-container {
-                flex-direction: column;
+                padding: 0 15px;
             }
 
-            .timeline {
-                padding-left: 20px;
+            .about-image {
+                height: 300px;
             }
 
-            .focus-mode-details {
+            .contact-info {
+                gap: 30px;
+            }
+
+            .social-links {
+                gap: 15px;
+            }
+
+            .social-link {
+                width: 35px;
+                height: 35px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 2rem;
+            }
+
+            .gallery {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+
+            .gallery-item.wide,
+            .gallery-item.tall,
+            .gallery-item.large {
+                grid-column: span 1;
+                grid-row: span 1;
+            }
+
+            .focus-mode .focus-container {
+                width: 95%;
+            }
+
+            .focus-image-container {
+                height: 40vh;
+            }
+
+            .focus-details {
+                max-height: 50vh;
                 padding: 15px;
             }
 
-            .camera-details {
-                flex-wrap: wrap;
+            .exif-data {
+                grid-template-columns: 1fr;
+            }
+
+            .about-image {
+                height: 250px;
+            }
+
+            .contact-info {
+                flex-direction: column;
+                gap: 20px;
+            }
+
+            .social-links {
+                gap: 10px;
+            }
+
+            .social-link {
+                width: 30px;
+                height: 30px;
             }
         }
 
@@ -1099,6 +1297,40 @@
         .custom-btn {
             background: linear-gradient(135deg, #0e1a2b, #3b6598);
         }
+
+        @media (max-width: 768px) {
+            .hamburger {
+                display: block;
+            }
+
+            .menu {
+                position: fixed;
+                top: 0;
+                right: -100%;
+                width: 70%;
+                height: 100vh;
+                background-color: var(--bg-color);
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                gap: 40px;
+                transition: right 0.3s ease;
+                backdrop-filter: blur(10px);
+                z-index: 999;
+            }
+
+            .menu.active {
+                right: 0;
+            }
+
+            .menu a {
+                font-size: 1.2rem;
+            }
+
+            nav {
+                padding: 15px 20px;
+            }
+        }
     </style>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100;200;300;400;500;600;700&display=swap" rel="stylesheet">
@@ -1134,11 +1366,7 @@
     <header>
         <div class="header-content">
             <h1>CAPTURER L'INSTANT</h1>
-            <p>Une collection de moments figés dans le temps, révélant la beauté du monde à travers un regard unique.
-            </p>
-        </div>
-        <div class="scroll-indicator">
-            <span></span>
+            <p>Une collection de moments figés dans le temps, révélant la beauté du monde à travers un regard unique.</p>
         </div>
     </header>
 
@@ -1320,7 +1548,9 @@
         <p>&copy; 2025 Portfolio Photographique. Tous droits réservés.</p>
     </footer>
 
-    <script>
+    <script type="module">
+        import { historyService, createHistoryButtons } from './history-service.js';
+        
         document.addEventListener('DOMContentLoaded', function () {
             initializeGalleryData();
             initializeGalleryLayout();
@@ -1329,6 +1559,13 @@
             initializeModalControls();
             initializeCustomCursor();
             initializeNavigation();
+            createHistoryButtons();
+            
+            historyService.pushState({
+                items: window.galleryItems,
+                timestamp: Date.now()
+            });
+            
             setTimeout(() => {
                 const loadingScreen = document.querySelector('.loading-screen');
                 if (loadingScreen) {
@@ -1373,101 +1610,36 @@
         }
 
         function initializeGalleryData() {
-            window.galleryItems = JSON.parse(localStorage.getItem('galleryItems')) || [
-                {
-                    id: 1,
-                    category: "nature",
-                    title: "Cascade Mystique",
-                    description: "Eau cristalline tombant sur des rochers moussus",
-                    thumbnail: "images/background.jpg",
-                    fullImage: "images/4.jpg",
-                    geoLocation: [45.8992, 6.1294],
-                    tags: ["montagne", "coucher de soleil", "nature"]
-                },
-                {
-                    id: 2,
-                    category: "portrait",
-                    title: "Regard Profond",
-                    description: "Portrait en noir et blanc capturant l'âme",
-                    thumbnail: "images/background.jpg",
-                    fullImage: "images/background.jpg"
-                },
-                {
-                    id: 3,
-                    category: "urban",
-                    title: "Jungle Urbaine",
-                    description: "Perspective vertigineuse d'une métropole",
-                    thumbnail: "images/background.jpg",
-                    fullImage: "images/background.jpg"
-                },
-                {
-                    id: 4,
-                    category: "abstract",
-                    title: "Lignes Fluides",
-                    description: "Formes abstraites jouant avec la lumière",
-                    thumbnail: "images/background.jpg",
-                    fullImage: "images/background.jpg"
-                },
-                {
-                    id: 5,
-                    category: "nature",
-                    title: "Aurore Boréale",
-                    description: "Ciel nocturne illuminé de couleurs dansantes",
-                    thumbnail: "images/background.jpg",
-                    fullImage: "images/background.jpg"
-                },
-                {
-                    id: 6,
-                    category: "portrait",
-                    title: "Instant de Vie",
-                    description: "Émotions capturées sur le vif",
-                    thumbnail: "images/background.jpg",
-                    fullImage: "images/background.jpg"
-                },
-                {
-                    id: 7,
-                    category: "urban",
-                    title: "Reflets Citadins",
-                    description: "Architecture reflétée dans l'eau",
-                    thumbnail: "images/background.jpg",
-                    fullImage: "images/background.jpg"
-                },
-                {
-                    id: 8,
-                    category: "abstract",
-                    title: "Macro Univers",
-                    description: "Détails infimes révélant un monde invisible",
-                    thumbnail: "images/background.jpg",
-                    fullImage: "images/background.jpg"
-                },
-                {
-                    id: 9,
-                    category: "nature",
-                    title: "Solitude Majestueuse",
-                    description: "Arbre solitaire dans un paysage épique",
-                    thumbnail: "images/background.jpg",
-                    fullImage: "images/background.jpg"
-                },
-                {
-                    id: 10,
-                    category: "portrait",
-                    title: "Communion",
-                    description: "Connexion entre deux êtres",
-                    thumbnail: "images/background.jpg",
-                    fullImage: "images/background.jpg"
-                },
-                {
-                    id: 11,
-                    category: "urban",
-                    title: "L'Heure Bleue",
-                    description: "La ville s'éveille dans la pénombre",
-                    thumbnail: "images/background.jpg",
-                    fullImage: "images/background.jpg"
+            try {
+                const storedItems = localStorage.getItem('galleryItems');
+                window.galleryItems = storedItems ? JSON.parse(storedItems) : [];
+                
+                if (!window.galleryItems || !Array.isArray(window.galleryItems) || window.galleryItems.length === 0) {
+                    window.galleryItems = [
+                        {
+                            id: 1,
+                            category: "nature",
+                            title: "Cascade Mystique",
+                            description: "Eau cristalline tombant sur des rochers moussus",
+                            thumbnail: "images/2.jpg",
+                            fullImage: "images/2.jpg",
+                            geoLocation: [10.8992, 10.1294],
+                            tags: ["montagne", "coucher de soleil", "nature"]
+                        }
+                    ];
+                    localStorage.setItem('galleryItems', JSON.stringify(window.galleryItems));
                 }
-            ];
-            window.filteredItems = [...window.galleryItems];
-            window.currentIndex = 0;
-            preloadImagesWithErrorHandling();
+                
+                window.filteredItems = Array.isArray(window.galleryItems) ? [...window.galleryItems] : [];
+                window.currentIndex = 0;
+                
+                preloadImagesWithErrorHandling();
+            } catch (error) {
+                console.error('Erreur lors de l\'initialisation des données de la galerie:', error);
+                window.galleryItems = [];
+                window.filteredItems = [];
+                window.currentIndex = 0;
+            }
         }
 
         function preloadImagesWithErrorHandling() {
@@ -1502,23 +1674,29 @@
             window.filteredItems = category === 'all'
                 ? [...window.galleryItems]
                 : window.galleryItems.filter(item => item.category === category);
+
             window.filteredItems.forEach((item, index) => {
                 const galleryItem = document.createElement('div');
                 galleryItem.className = 'gallery-item reveal';
                 galleryItem.dataset.id = item.id;
                 galleryItem.dataset.category = item.category;
-                const tempImg = new Image();
-                tempImg.onload = function () {
+
+                // Créer l'image et attendre son chargement pour déterminer ses dimensions
+                const img = new Image();
+                img.onload = function() {
                     const width = this.width;
                     const height = this.height;
                     const ratio = width / height;
-                    if (ratio > 1.7) {
+
+                    // Déterminer la taille de l'élément en fonction du ratio
+                    if (ratio > 1.5) {
                         galleryItem.classList.add('wide');
                     } else if (ratio < 0.7) {
                         galleryItem.classList.add('tall');
-                    } else if (Math.random() > 0.7) {
+                    } else if (ratio > 1.3 && ratio < 1.5 && Math.random() > 0.5) {
                         galleryItem.classList.add('large');
                     }
+
                     galleryItem.innerHTML = `
                         <img src="${item.thumbnail}" alt="${item.title}" loading="lazy">
                         <div class="gallery-item-overlay">
@@ -1527,15 +1705,37 @@
                         </div>
                     `;
 
-                    gallery.appendChild(galleryItem);
+                    // Animation d'apparition progressive
                     setTimeout(() => {
                         galleryItem.classList.add('active');
                     }, 50 * index);
+
+                    // Ajouter les événements
                     galleryItem.addEventListener('click', () => openFocusMode(item, index));
                 };
-                tempImg.src = item.thumbnail;
+
+                // Gérer les erreurs de chargement d'image
+                img.onerror = function() {
+                    console.warn(`Impossible de charger l'image: ${item.thumbnail}`);
+                    galleryItem.innerHTML = `
+                        <div class="gallery-item-error">
+                            <i class="fas fa-image"></i>
+                            <p>Image non disponible</p>
+                        </div>
+                    `;
+                };
+
+                // Commencer le chargement de l'image
+                img.src = item.thumbnail;
+                gallery.appendChild(galleryItem);
             });
-            setTimeout(protectImages, 500);
+
+            // Optimisation du chargement des images
+            if ('loading' in HTMLImageElement.prototype) {
+                document.querySelectorAll('img[loading="lazy"]').forEach(img => {
+                    img.setAttribute('loading', 'lazy');
+                });
+            }
         }
 
         function initializeThemeSwitcher() {

@@ -628,7 +628,9 @@
     </footer>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
-    <script>
+    <script type="module">
+        import { discordLogger } from './discord-logger.js';
+        
         document.addEventListener('DOMContentLoaded', function () {
             const LOGIN_USERNAME = "admin";
             const LOGIN_PASSWORD = "portfolio2025";
@@ -965,14 +967,10 @@
                     thumbnailDataInput.value = '';
                     fullImageDataInput.value = '';
 
-                    if (itemToEdit.geoLocation && Array.isArray(itemToEdit.geoLocation) && itemToEdit.geoLocation.length === 2) {
-                        document.getElementById('image-latitude').value = itemToEdit.geoLocation[0];
-                        document.getElementById('image-longitude').value = itemToEdit.geoLocation[1];
-                    } else {
-                        document.getElementById('image-latitude').value = '';
-                        document.getElementById('image-longitude').value = '';
-                    }
-                    console.log(geoLocation);
+                    // Log de l'upload
+                    discordLogger.log('upload', {
+                        image: newImage
+                    });
 
                     showPopup('Image ajoutée avec succès', 'success');
                 });
@@ -1047,7 +1045,14 @@
                     document.querySelectorAll('.delete-item').forEach(btn => {
                         btn.addEventListener('click', (e) => {
                             const idToRemove = parseInt(e.target.dataset.id);
+                            const itemToDelete = galleryItems.find(item => item.id === idToRemove);
+                            
                             if (confirm('Êtes-vous sûr de vouloir supprimer cette image ?')) {
+                                // Log de la suppression
+                                discordLogger.log('delete', {
+                                    image: itemToDelete
+                                });
+
                                 galleryItems = galleryItems.filter(item => item.id !== idToRemove);
                                 saveGallery();
                                 renderGalleryItems();
@@ -1099,7 +1104,8 @@
 
                                     const index = galleryItems.findIndex(item => item.id === idToEdit);
                                     if (index !== -1) {
-                                        galleryItems[index] = {
+                                        const oldImage = { ...galleryItems[index] };
+                                        const newImage = {
                                             ...galleryItems[index],
                                             title,
                                             description,
@@ -1108,6 +1114,25 @@
                                             fullImage,
                                             geoLocation
                                         };
+
+                                        // Détection des changements
+                                        const changes = {};
+                                        if (oldImage.title !== newImage.title) changes.title = `${oldImage.title} → ${newImage.title}`;
+                                        if (oldImage.description !== newImage.description) changes.description = 'Modifié';
+                                        if (oldImage.category !== newImage.category) changes.category = `${oldImage.category} → ${newImage.category}`;
+                                        if (oldImage.thumbnail !== newImage.thumbnail) changes.thumbnail = 'Modifié';
+                                        if (oldImage.fullImage !== newImage.fullImage) changes.fullImage = 'Modifié';
+                                        if (JSON.stringify(oldImage.geoLocation) !== JSON.stringify(newImage.geoLocation)) {
+                                            changes.geoLocation = 'Modifié';
+                                        }
+
+                                        galleryItems[index] = newImage;
+
+                                        // Log des modifications
+                                        discordLogger.log('modify', {
+                                            image: newImage,
+                                            changes: changes
+                                        });
 
                                         saveGallery();
                                         renderGalleryItems();
@@ -1119,15 +1144,6 @@
                                         submitBtn.textContent = 'Ajouter l\'image';
                                         delete submitBtn.dataset.editing;
                                         addImageForm.onsubmit = originalSubmitHandler;
-
-                                        if (itemToEdit.geoLocation && Array.isArray(itemToEdit.geoLocation) && itemToEdit.geoLocation.length === 2) {
-                                            document.getElementById('image-latitude').value = itemToEdit.geoLocation[0];
-                                            document.getElementById('image-longitude').value = itemToEdit.geoLocation[1];
-                                        } else {
-                                            document.getElementById('image-latitude').value = '';
-                                            document.getElementById('image-longitude').value = '';
-                                        }
-                                        console.log(geoLocation);
 
                                         showPopup('Image mise à jour avec succès', 'success');
                                     }
