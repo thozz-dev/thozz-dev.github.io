@@ -1664,6 +1664,10 @@
                         reject(error);
                     });
             });
+
+            setTimeout(() => {
+                protectImages();
+            }, 100);
         }
 
         function preloadImagesWithErrorHandling() {
@@ -1674,6 +1678,10 @@
                 };
                 img.src = item.fullImage;
             });
+
+            setTimeout(() => {
+                protectImages();
+            }, 100);
         }
 
         function initializeGalleryLayout() {
@@ -1689,6 +1697,10 @@
                 });
             });
             loadGallery('all');
+
+            setTimeout(() => {
+                protectImages();
+            }, 100);
         }
 
         function loadGallery(category = 'all') {
@@ -1755,6 +1767,10 @@
                     img.setAttribute('loading', 'lazy');
                 });
             }
+
+            setTimeout(() => {
+                protectImages();
+            }, 100);
         }
 
         function initializeThemeSwitcher() {
