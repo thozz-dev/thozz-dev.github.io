@@ -1611,12 +1611,20 @@
 
         function initializeGalleryData() {
             try {
+                // Essayer d'abord de charger depuis le localStorage
                 const storedItems = localStorage.getItem('galleryItems');
                 let items = storedItems ? JSON.parse(storedItems) : null;
                 
+                // Si pas de données dans le localStorage ou données invalides, charger depuis gallery.json
                 if (!items || !Array.isArray(items) || items.length === 0) {
                     console.log('Chargement des données depuis gallery.json...');
-                    fetch('gallery.json')
+                    
+                    // Déterminer le chemin de base pour GitHub Pages
+                    const basePath = window.location.hostname.includes('github.io') 
+                        ? window.location.pathname.split('/').slice(0, -1).join('/') 
+                        : '';
+                    
+                    fetch(`${basePath}/gallery.json`)
                         .then(response => {
                             if (!response.ok) {
                                 throw new Error(`HTTP error! status: ${response.status}`);
@@ -1625,23 +1633,31 @@
                         })
                         .then(data => {
                             if (data && data.items && Array.isArray(data.items)) {
-                                window.galleryItems = data.items;
-                                localStorage.setItem('galleryItems', JSON.stringify(data.items));
-                                console.log(`${data.items.length} images chargées depuis gallery.json`);
+                                // Mettre à jour les chemins des images pour GitHub Pages
+                                const updatedItems = data.items.map(item => ({
+                                    ...item,
+                                    thumbnail: `${basePath}/${item.thumbnail}`,
+                                    fullImage: `${basePath}/${item.fullImage}`
+                                }));
+                                
+                                window.galleryItems = updatedItems;
+                                localStorage.setItem('galleryItems', JSON.stringify(updatedItems));
+                                console.log(`${updatedItems.length} images chargées depuis gallery.json`);
                             } else {
                                 throw new Error('Format de données invalide dans gallery.json');
                             }
                         })
                         .catch(error => {
                             console.error('Erreur lors du chargement de gallery.json:', error);
+                            // Fallback sur les données par défaut avec chemins absolus
                             window.galleryItems = [
                                 {
                                     id: 1,
                                     category: "nature",
                                     title: "Cascade Mystique",
                                     description: "Eau cristalline tombant sur des rochers moussus",
-                                    thumbnail: "images/2.jpg",
-                                    fullImage: "images/2.jpg",
+                                    thumbnail: `${basePath}/images/2.jpg`,
+                                    fullImage: `${basePath}/images/2.jpg`,
                                     geoLocation: [48.791284, 2.261416],
                                     tags: ["montagne", "eau", "nature"],
                                     exif: {
@@ -1662,9 +1678,11 @@
                     console.log(`${items.length} images chargées depuis le localStorage`);
                 }
                 
+                // Initialiser les items filtrés et l'index courant
                 window.filteredItems = Array.isArray(window.galleryItems) ? [...window.galleryItems] : [];
                 window.currentIndex = 0;
                 
+                // Précharger les images
                 preloadImagesWithErrorHandling();
                 
             } catch (error) {
@@ -2128,6 +2146,90 @@
                     cursor.classList.remove('hover-effect');
                 });
             });
+        }
+
+        function initializeGalleryData() {
+            try {
+                // Essayer d'abord de charger depuis le localStorage
+                const storedItems = localStorage.getItem('galleryItems');
+                let items = storedItems ? JSON.parse(storedItems) : null;
+                
+                // Si pas de données dans le localStorage ou données invalides, charger depuis gallery.json
+                if (!items || !Array.isArray(items) || items.length === 0) {
+                    console.log('Chargement des données depuis gallery.json...');
+                    
+                    // Déterminer le chemin de base pour GitHub Pages
+                    const basePath = window.location.hostname.includes('github.io') 
+                        ? window.location.pathname.split('/').slice(0, -1).join('/') 
+                        : '';
+                    
+                    fetch(`${basePath}/gallery.json`)
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error(`HTTP error! status: ${response.status}`);
+                            }
+                            return response.json();
+                        })
+                        .then(data => {
+                            if (data && data.items && Array.isArray(data.items)) {
+                                // Mettre à jour les chemins des images pour GitHub Pages
+                                const updatedItems = data.items.map(item => ({
+                                    ...item,
+                                    thumbnail: `${basePath}/${item.thumbnail}`,
+                                    fullImage: `${basePath}/${item.fullImage}`
+                                }));
+                                
+                                window.galleryItems = updatedItems;
+                                localStorage.setItem('galleryItems', JSON.stringify(updatedItems));
+                                console.log(`${updatedItems.length} images chargées depuis gallery.json`);
+                            } else {
+                                throw new Error('Format de données invalide dans gallery.json');
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Erreur lors du chargement de gallery.json:', error);
+                            // Fallback sur les données par défaut avec chemins absolus
+                            window.galleryItems = [
+                                {
+                                    id: 1,
+                                    category: "nature",
+                                    title: "Cascade Mystique",
+                                    description: "Eau cristalline tombant sur des rochers moussus",
+                                    thumbnail: `${basePath}/images/2.jpg`,
+                                    fullImage: `${basePath}/images/2.jpg`,
+                                    geoLocation: [48.791284, 2.261416],
+                                    tags: ["montagne", "eau", "nature"],
+                                    exif: {
+                                        camera: "Canon EOS R5",
+                                        lens: "24-70mm f/2.8",
+                                        focalLength: "50mm",
+                                        aperture: "f/4.0",
+                                        shutterSpeed: "1/250s",
+                                        iso: "400"
+                                    }
+                                }
+                            ];
+                            localStorage.setItem('galleryItems', JSON.stringify(window.galleryItems));
+                            console.log('Utilisation des données par défaut');
+                        });
+                } else {
+                    window.galleryItems = items;
+                    console.log(`${items.length} images chargées depuis le localStorage`);
+                }
+                
+                // Initialiser les items filtrés et l'index courant
+                window.filteredItems = Array.isArray(window.galleryItems) ? [...window.galleryItems] : [];
+                window.currentIndex = 0;
+                
+                // Précharger les images
+                preloadImagesWithErrorHandling();
+                
+            } catch (error) {
+                console.error('Erreur lors de l\'initialisation des données de la galerie:', error);
+                window.galleryItems = [];
+                window.filteredItems = [];
+                window.currentIndex = 0;
+            }
         }
 
         function initializeParallaxEffect() {
