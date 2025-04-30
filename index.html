@@ -1549,7 +1549,7 @@
     </footer>
 
     <script type="module">
-        import { historyService, createHistoryButtons } from './history-service.js';
+        //import { historyService, createHistoryButtons } from './history-service.js';
         
         document.addEventListener('DOMContentLoaded', function () {
             // Initialiser d'abord les données de la galerie
@@ -1562,7 +1562,7 @@
                 initializeCustomCursor();
                 initializeNavigation();
                 initializeMapFeature();
-                createHistoryButtons();
+                //createHistoryButtons();
                 
                 historyService.pushState({
                     items: window.galleryItems,
