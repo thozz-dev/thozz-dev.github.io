@@ -1552,27 +1552,32 @@
         import { historyService, createHistoryButtons } from './history-service.js';
         
         document.addEventListener('DOMContentLoaded', function () {
-            initializeGalleryData();
-            initializeGalleryLayout();
-            initializeThemeSwitcher();
-            initializeFocusMode();
-            initializeModalControls();
-            initializeCustomCursor();
-            initializeNavigation();
-            createHistoryButtons();
-            
-            historyService.pushState({
-                items: window.galleryItems,
-                timestamp: Date.now()
+            // Initialiser d'abord les données de la galerie
+            initializeGalleryData().then(() => {
+                // Une fois les données chargées, initialiser le reste
+                initializeGalleryLayout();
+                initializeThemeSwitcher();
+                initializeFocusMode();
+                initializeModalControls();
+                initializeCustomCursor();
+                initializeNavigation();
+                initializeMapFeature();
+                createHistoryButtons();
+                
+                historyService.pushState({
+                    items: window.galleryItems,
+                    timestamp: Date.now()
+                });
+                
+                setTimeout(() => {
+                    const loadingScreen = document.querySelector('.loading-screen');
+                    if (loadingScreen) {
+                        loadingScreen.classList.add('hidden');
+                    }
+                    reveal();
+                }, 1500);
             });
             
-            setTimeout(() => {
-                const loadingScreen = document.querySelector('.loading-screen');
-                if (loadingScreen) {
-                    loadingScreen.classList.add('hidden');
-                }
-                reveal();
-            }, 1500);
             window.addEventListener('scroll', reveal);
             window.addEventListener('scroll', updateNavbarOnScroll);
         });
@@ -1610,49 +1615,55 @@
         }
 
         function initializeGalleryData() {
-            const basePath = window.location.hostname.includes('github.io') 
-                ? window.location.pathname.split('/').slice(0, -1).join('/') 
-                : '';
-            
-            const galleryJsonPath = `${basePath}/gallery.json`;
-            
-            fetch(galleryJsonPath)
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error(`HTTP error! status: ${response.status}`);
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    if (data && data.items && Array.isArray(data.items)) {
-                        const updatedItems = data.items.map(item => ({
-                            ...item,
-                            thumbnail: `${basePath}/${item.thumbnail}`,
-                            fullImage: `${basePath}/${item.fullImage}`,
-                            exif: {
-                                camera: "Canon EOS R5",
-                                lens: "24-70mm f/2.8",
-                                focalLength: "50mm",
-                                aperture: "f/4.0",
-                                shutterSpeed: "1/250s",
-                                iso: "400"
-                            }
-                        }));
-                        
-                        window.galleryItems = updatedItems;
-                        localStorage.setItem('galleryItems', JSON.stringify(updatedItems));
-                        console.log(`${updatedItems.length} images chargées depuis gallery.json`);
-                        loadGallery('all');
-                    } else {
-                        throw new Error('Format de données invalide dans gallery.json');
-                    }
-                })
-                .catch(error => {
-                    console.error('Erreur lors du chargement de gallery.json:', error);
-                    window.galleryItems = [];
-                    window.filteredItems = [];
-                    window.currentIndex = 0;
-                });
+            return new Promise((resolve, reject) => {
+                const basePath = window.location.hostname.includes('github.io') 
+                    ? window.location.pathname.split('/').slice(0, -1).join('/') 
+                    : '';
+                
+                const galleryJsonPath = `${basePath}/gallery.json`;
+                
+                fetch(galleryJsonPath)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error(`HTTP error! status: ${response.status}`);
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        if (data && data.items && Array.isArray(data.items)) {
+                            const updatedItems = data.items.map(item => ({
+                                ...item,
+                                thumbnail: `${basePath}/${item.thumbnail}`,
+                                fullImage: `${basePath}/${item.fullImage}`,
+                                exif: {
+                                    camera: "Canon EOS R5",
+                                    lens: "24-70mm f/2.8",
+                                    focalLength: "50mm",
+                                    aperture: "f/4.0",
+                                    shutterSpeed: "1/250s",
+                                    iso: "400"
+                                }
+                            }));
+                            
+                            window.galleryItems = updatedItems;
+                            window.filteredItems = [...updatedItems];
+                            window.currentIndex = 0;
+                            
+                            localStorage.setItem('galleryItems', JSON.stringify(updatedItems));
+                            console.log(`${updatedItems.length} images chargées depuis gallery.json`);
+                            resolve();
+                        } else {
+                            throw new Error('Format de données invalide dans gallery.json');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Erreur lors du chargement de gallery.json:', error);
+                        window.galleryItems = [];
+                        window.filteredItems = [];
+                        window.currentIndex = 0;
+                        reject(error);
+                    });
+            });
         }
 
         function preloadImagesWithErrorHandling() {
@@ -1682,6 +1693,8 @@
 
         function loadGallery(category = 'all') {
             const gallery = document.querySelector('.gallery');
+            if (!gallery || !window.galleryItems) return;
+            
             gallery.innerHTML = '';
 
             window.filteredItems = category === 'all'
