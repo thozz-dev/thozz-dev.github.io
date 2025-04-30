@@ -7,8 +7,8 @@
         "category": "nature",
         "title": "Cascade Mystique",
         "description": "Eau cristalline tombant sur des rochers moussus",
-        "thumbnail": "images/nature/cascade.jpg",
-        "fullImage": "images/nature/cascade.jpg",
+        "thumbnail": "images/2.jpg",
+        "fullImage": "images/2.jpg",
         "geoLocation": [45.8992, 6.1294],
         "tags": ["montagne", "eau", "nature"]
     },
@@ -17,8 +17,8 @@
         "category": "urban",
         "title": "Reflets Urbains",
         "description": "Architecture moderne reflétée dans l'eau",
-        "thumbnail": "images/urban/reflections.jpg",
-        "fullImage": "images/urban/reflections.jpg",
+        "thumbnail": "images/3.jpg",
+        "fullImage": "images/3.jpg",
         "geoLocation": [48.8566, 2.3522],
         "tags": ["ville", "architecture", "reflets"]
     },
@@ -27,8 +27,8 @@
         "category": "portrait",
         "title": "Regard Intense",
         "description": "Portrait en noir et blanc capturant l'émotion",
-        "thumbnail": "images/portrait/intense.jpg",
-        "fullImage": "images/portrait/intense.jpg",
+        "thumbnail": "images/1.jpg",
+        "fullImage": "images/1.jpg",
         "geoLocation": [43.2965, 5.3698],
         "tags": ["portrait", "noir et blanc", "emotion"]
     },
@@ -37,8 +37,8 @@
         "category": "abstract",
         "title": "Lignes et Courbes",
         "description": "Composition abstraite de formes géométriques",
-        "thumbnail": "images/abstract/lines.jpg",
-        "fullImage": "images/abstract/lines.jpg",
+        "thumbnail": "images/4.jpg",
+        "fullImage": "images/4.jpg",
         "geoLocation": [50.8503, 4.3517],
         "tags": ["abstrait", "géométrie", "art"]
     }

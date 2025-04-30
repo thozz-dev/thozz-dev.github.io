@@ -1694,14 +1694,12 @@
                 galleryItem.dataset.id = item.id;
                 galleryItem.dataset.category = item.category;
 
-                // Créer l'image et attendre son chargement pour déterminer ses dimensions
                 const img = new Image();
                 img.onload = function() {
                     const width = this.width;
                     const height = this.height;
                     const ratio = width / height;
 
-                    // Déterminer la taille de l'élément en fonction du ratio
                     if (ratio > 1.5) {
                         galleryItem.classList.add('wide');
                     } else if (ratio < 0.7) {
@@ -1718,16 +1716,13 @@
                         </div>
                     `;
 
-                    // Animation d'apparition progressive
                     setTimeout(() => {
                         galleryItem.classList.add('active');
                     }, 50 * index);
 
-                    // Ajouter les événements
                     galleryItem.addEventListener('click', () => openFocusMode(item, index));
                 };
 
-                // Gérer les erreurs de chargement d'image
                 img.onerror = function() {
                     console.warn(`Impossible de charger l'image: ${item.thumbnail}`);
                     galleryItem.innerHTML = `
@@ -1738,12 +1733,10 @@
                     `;
                 };
 
-                // Commencer le chargement de l'image
                 img.src = item.thumbnail;
                 gallery.appendChild(galleryItem);
             });
 
-            // Optimisation du chargement des images
             if ('loading' in HTMLImageElement.prototype) {
                 document.querySelectorAll('img[loading="lazy"]').forEach(img => {
                     img.setAttribute('loading', 'lazy');
