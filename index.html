@@ -1637,6 +1637,38 @@
             }
         }
 
+        function initializeTimelineAnimation() {
+            const timeline = document.querySelector('.timeline');
+            if (!timeline) return;
+
+            const timelineItems = document.querySelectorAll('.timeline-item');
+            
+            function isElementInViewport(el) {
+                const rect = el.getBoundingClientRect();
+                return (
+                    rect.top <= (window.innerHeight || document.documentElement.clientHeight) * 0.8 &&
+                    rect.bottom >= 0
+                );
+            }
+
+            function checkTimelineElements() {
+                timelineItems.forEach((item, index) => {
+                    if (isElementInViewport(item)) {
+                        setTimeout(() => {
+                            item.classList.add('active');
+                        }, 300 * index);
+                    }
+                });
+            }
+
+            // Vérifier les éléments au chargement
+            checkTimelineElements();
+
+            // Ajouter les écouteurs d'événements
+            window.addEventListener('scroll', checkTimelineElements);
+            window.addEventListener('resize', checkTimelineElements);
+        }
+
         document.addEventListener('DOMContentLoaded', function () {
             initializeGalleryData().then(() => {
                 initializeGalleryLayout();
@@ -1645,6 +1677,7 @@
                 initializeModalControls();
                 initializeCustomCursor();
                 initializeNavigation();
+                initializeTimelineAnimation();
 
                 setTimeout(() => {
                     initializeMapFeature();
