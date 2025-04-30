@@ -1549,25 +1549,106 @@
     </footer>
 
     <script type="module">
-        //import { historyService, createHistoryButtons } from './history-service.js';
-        
+        let map = null;
+
+        function initializeMapFeature() {
+            const mapContainer = document.getElementById('photo-map');
+
+            if (!mapContainer) {
+                console.error('Conteneur de carte non trouvé');
+                return;
+            }
+
+            if (map) {
+                map.remove();
+                map = null;
+            }
+
+            try {
+                map = L.map('photo-map').setView([46.603354, 1.888334], 5);
+
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                }).addTo(map);
+
+                const allMarkers = L.layerGroup().addTo(map);
+                const natureMarkers = L.layerGroup();
+                const urbanMarkers = L.layerGroup();
+
+                if (!window.galleryItems || !Array.isArray(window.galleryItems)) {
+                    console.error('Aucune donnée de galerie disponible');
+                    return;
+                }
+
+                window.galleryItems.forEach(item => {
+                    if (item.geoLocation && Array.isArray(item.geoLocation) && item.geoLocation.length === 2) {
+                        const marker = L.marker(item.geoLocation)
+                            .bindPopup(`
+                                <div class="popup-content">
+                                    <img src="${item.thumbnail}" alt="${item.title}" style="width: 100%; max-height: 150px; object-fit: cover;">
+                                    <h4>${item.title}</h4>
+                                    <p>${item.description}</p>
+                                </div>
+                            `);
+
+                        allMarkers.addLayer(marker);
+                        
+                        if (item.category === 'nature') {
+                            natureMarkers.addLayer(marker);
+                        } else if (item.category === 'urban') {
+                            urbanMarkers.addLayer(marker);
+                        }
+                        
+                        console.log(`Marqueur ajouté pour ${item.title} à ${item.geoLocation}`);
+                    } else {
+                        console.warn(`Coordonnées GPS manquantes ou invalides pour ${item.title}`);
+                    }
+                });
+
+                document.querySelectorAll('.map-btn').forEach(button => {
+                    button.addEventListener('click', function() {
+                        const filter = this.getAttribute('data-filter');
+
+                        map.removeLayer(allMarkers);
+                        map.removeLayer(natureMarkers);
+                        map.removeLayer(urbanMarkers);
+
+                        if (filter === 'all') {
+                            map.addLayer(allMarkers);
+                        } else if (filter === 'nature') {
+                            map.addLayer(natureMarkers);
+                        } else if (filter === 'urban') {
+                            map.addLayer(urbanMarkers);
+                        }
+                        
+                        document.querySelectorAll('.map-btn').forEach(btn => {
+                            btn.classList.remove('active');
+                        });
+                        this.classList.add('active');
+                    });
+                });
+                
+                document.querySelector('.map-btn[data-filter="all"]').classList.add('active');
+                
+                console.log('Carte initialisée avec succès');
+
+            } catch (error) {
+                console.error('Erreur lors de l\'initialisation de la carte:', error);
+            }
+        }
+
         document.addEventListener('DOMContentLoaded', function () {
-            // Initialiser d'abord les données de la galerie
             initializeGalleryData().then(() => {
-                // Une fois les données chargées, initialiser le reste
                 initializeGalleryLayout();
                 initializeThemeSwitcher();
                 initializeFocusMode();
                 initializeModalControls();
                 initializeCustomCursor();
                 initializeNavigation();
-                initializeMapFeature();
-                //createHistoryButtons();
-                
-                // historyService.pushState({
-                //     items: window.galleryItems,
-                //     timestamp: Date.now()
-                // });
+
+                setTimeout(() => {
+                    initializeMapFeature();
+                }, 100);
                 
                 setTimeout(() => {
                     const loadingScreen = document.querySelector('.loading-screen');
@@ -2180,132 +2261,6 @@
                 });
             });
         }
-
-        function initializeMapFeature() {
-            const mapContainer = document.getElementById('photo-map');
-
-            if (!mapContainer) {
-                console.error('Conteneur de carte non trouvé');
-                return;
-            }
-
-            try {
-                const map = L.map('photo-map').setView([46.603354, 1.888334], 5);
-
-                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                }).addTo(map);
-
-                const allMarkers = L.layerGroup().addTo(map);
-                const natureMarkers = L.layerGroup();
-                const urbanMarkers = L.layerGroup();
-
-                if (!window.galleryItems || !Array.isArray(window.galleryItems)) {
-                    console.error('Aucune donnée de galerie disponible');
-                    return;
-                }
-
-                window.galleryItems.forEach(item => {
-                    if (item.geoLocation && Array.isArray(item.geoLocation) && item.geoLocation.length === 2) {
-                        const marker = L.marker(item.geoLocation)
-                            .bindPopup(`
-                                <div class="popup-content">
-                                    <img src="${item.thumbnail}" alt="${item.title}" style="width: 100%; max-height: 150px; object-fit: cover;">
-                                    <h4>${item.title}</h4>
-                                    <p>${item.description}</p>
-                                </div>
-                            `);
-
-                        allMarkers.addLayer(marker);
-                        
-                        if (item.category === 'nature') {
-                            natureMarkers.addLayer(marker);
-                        } else if (item.category === 'urban') {
-                            urbanMarkers.addLayer(marker);
-                        }
-                        
-                        console.log(`Marqueur ajouté pour ${item.title} à ${item.geoLocation}`);
-                    } else {
-                        console.warn(`Coordonnées GPS manquantes ou invalides pour ${item.title}`);
-                    }
-                });
-
-                document.querySelectorAll('.map-btn').forEach(button => {
-                    button.addEventListener('click', function() {
-                        const filter = this.getAttribute('data-filter');
-
-                        map.removeLayer(allMarkers);
-                        map.removeLayer(natureMarkers);
-                        map.removeLayer(urbanMarkers);
-
-                        if (filter === 'all') {
-                            map.addLayer(allMarkers);
-                        } else if (filter === 'nature') {
-                            map.addLayer(natureMarkers);
-                        } else if (filter === 'urban') {
-                            map.addLayer(urbanMarkers);
-                        }
-                        
-                        document.querySelectorAll('.map-btn').forEach(btn => {
-                            btn.classList.remove('active');
-                        });
-                        this.classList.add('active');
-                    });
-                });
-                
-                document.querySelector('.map-btn[data-filter="all"]').classList.add('active');
-                
-                console.log('Carte initialisée avec succès');
-
-            } catch (error) {
-                console.error('Erreur lors de l\'initialisation de la carte:', error);
-            }
-        }
-
-        document.addEventListener('DOMContentLoaded', initializeMapFeature);
-
-        function initializeTimelineAnimation() {
-            const timeline = document.querySelector('.timeline');
-
-            if (!timeline) return;
-            const timelineItems = document.querySelectorAll('.timeline-item');
-
-            window.addEventListener('scroll', () => {
-                timelineItems.forEach((item, index) => {
-                    const itemTop = item.getBoundingClientRect().top;
-
-                    if (itemTop < window.innerHeight * 0.8) {
-                        setTimeout(() => {
-                            item.classList.add('active');
-                        }, 300 * index);
-                    }
-                });
-            });
-        }
-
-        document.addEventListener('DOMContentLoaded', function() {
-            function isElementInViewport(el) {
-                const rect = el.getBoundingClientRect();
-                return (
-                    rect.top <= (window.innerHeight || document.documentElement.clientHeight) * 0.8 &&
-                    rect.bottom >= 0
-                );
-            }
-
-            function checkTimelineElements() {
-                const timelineItems = document.querySelectorAll('.timeline-item');
-                
-                timelineItems.forEach(item => {
-                    if (isElementInViewport(item)) {
-                        item.classList.add('active');
-                    }
-                });
-            }
-
-            checkTimelineElements();
-            window.addEventListener('scroll', checkTimelineElements);
-            window.addEventListener('resize', checkTimelineElements);
-        });
 
         localStorage.clear();
     </script>
