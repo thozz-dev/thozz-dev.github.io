@@ -1610,87 +1610,49 @@
         }
 
         function initializeGalleryData() {
-            try {
-                const items = window.galleryItems;
-
-                if (!items || !Array.isArray(items) || items.length === 0) {
-                    console.log('Chargement des données depuis gallery.json...');
-
-                    const basePath = window.location.hostname.includes('github.io') 
-                        ? window.location.pathname.split('/').slice(0, -1).join('/') 
-                        : '';
-                    
-                    const galleryJsonPath = `${basePath}/gallery.json`;
-                    console.log('Tentative de chargement depuis:', galleryJsonPath);
-                    
-                    fetch(galleryJsonPath)
-                        .then(response => {
-                            console.log('Réponse du serveur:', response.status, response.statusText);
-                            if (!response.ok) {
-                                throw new Error(`HTTP error! status: ${response.status}`);
+            const basePath = window.location.hostname.includes('github.io') 
+                ? window.location.pathname.split('/').slice(0, -1).join('/') 
+                : '';
+            
+            const galleryJsonPath = `${basePath}/gallery.json`;
+            
+            fetch(galleryJsonPath)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data && data.items && Array.isArray(data.items)) {
+                        const updatedItems = data.items.map(item => ({
+                            ...item,
+                            thumbnail: `${basePath}/${item.thumbnail}`,
+                            fullImage: `${basePath}/${item.fullImage}`,
+                            exif: {
+                                camera: "Canon EOS R5",
+                                lens: "24-70mm f/2.8",
+                                focalLength: "50mm",
+                                aperture: "f/4.0",
+                                shutterSpeed: "1/250s",
+                                iso: "400"
                             }
-                            return response.json();
-                        })
-                        .then(data => {
-                            console.log('Données reçues:', data);
-                            if (data && data.items && Array.isArray(data.items)) {
-                                const updatedItems = data.items.map(item => ({
-                                    ...item,
-                                    thumbnail: `${basePath}/${item.thumbnail}`,
-                                    fullImage: `${basePath}/${item.fullImage}`
-                                }));
-                                
-                                window.galleryItems = updatedItems;
-                                localStorage.setItem('galleryItems', JSON.stringify(updatedItems));
-                                console.log(`${updatedItems.length} images chargées depuis gallery.json`);
-                                loadGallery('all');
-                            } else {
-                                console.error('Format de données invalide:', data);
-                                throw new Error('Format de données invalide dans gallery.json');
-                            }
-                        })
-                        .catch(error => {
-                            console.error('Erreur lors du chargement de gallery.json:', error);
-                            window.galleryItems = [
-                                {
-                                    id: 1,
-                                    category: "nature",
-                                    title: "Cascade Mystique",
-                                    description: "Eau cristalline tombant sur des rochers moussus",
-                                    thumbnail: `${basePath}/images/2.jpg`,
-                                    fullImage: `${basePath}/images/2.jpg`,
-                                    geoLocation: [48.791284, 2.261416],
-                                    tags: ["montagne", "eau", "nature"],
-                                    exif: {
-                                        camera: "Canon EOS R5",
-                                        lens: "24-70mm f/2.8",
-                                        focalLength: "50mm",
-                                        aperture: "f/4.0",
-                                        shutterSpeed: "1/250s",
-                                        iso: "400"
-                                    }
-                                }
-                            ];
-                            localStorage.setItem('galleryItems', JSON.stringify(window.galleryItems));
-                            console.log('Utilisation des données par défaut');
-                            loadGallery('all');
-                        });
-                } else {
-                    console.log('Données trouvées dans le localStorage:', items);
-                    window.galleryItems = items;
-                    console.log(`${items.length} images chargées depuis le localStorage`);
-                }
-
-                window.filteredItems = Array.isArray(window.galleryItems) ? [...window.galleryItems] : [];
-                window.currentIndex = 0;
-                preloadImagesWithErrorHandling();
-                
-            } catch (error) {
-                console.error('Erreur lors de l\'initialisation des données de la galerie:', error);
-                window.galleryItems = [];
-                window.filteredItems = [];
-                window.currentIndex = 0;
-            }
+                        }));
+                        
+                        window.galleryItems = updatedItems;
+                        localStorage.setItem('galleryItems', JSON.stringify(updatedItems));
+                        console.log(`${updatedItems.length} images chargées depuis gallery.json`);
+                        loadGallery('all');
+                    } else {
+                        throw new Error('Format de données invalide dans gallery.json');
+                    }
+                })
+                .catch(error => {
+                    console.error('Erreur lors du chargement de gallery.json:', error);
+                    window.galleryItems = [];
+                    window.filteredItems = [];
+                    window.currentIndex = 0;
+                });
         }
 
         function preloadImagesWithErrorHandling() {
