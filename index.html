@@ -1549,147 +1549,22 @@
     </footer>
 
     <script type="module">
-        let map = null;
-
-        function initializeMapFeature() {
-            const mapContainer = document.getElementById('photo-map');
-
-            if (!mapContainer) {
-                console.error('Conteneur de carte non trouvé');
-                return;
-            }
-
-            if (map) {
-                map.remove();
-                map = null;
-            }
-
-            try {
-                map = L.map('photo-map').setView([46.603354, 1.888334], 5);
-
-                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                }).addTo(map);
-
-                const allMarkers = L.layerGroup().addTo(map);
-                const natureMarkers = L.layerGroup();
-                const urbanMarkers = L.layerGroup();
-
-                if (!window.galleryItems || !Array.isArray(window.galleryItems)) {
-                    console.error('Aucune donnée de galerie disponible');
-                    return;
-                }
-
-                window.galleryItems.forEach(item => {
-                    if (item.geoLocation && Array.isArray(item.geoLocation) && item.geoLocation.length === 2) {
-                        const marker = L.marker(item.geoLocation)
-                            .bindPopup(`
-                                <div class="popup-content">
-                                    <img src="${item.thumbnail}" alt="${item.title}" style="width: 100%; max-height: 150px; object-fit: cover;">
-                                    <h4>${item.title}</h4>
-                                    <p>${item.description}</p>
-                                </div>
-                            `);
-
-                        allMarkers.addLayer(marker);
-                        
-                        if (item.category === 'nature') {
-                            natureMarkers.addLayer(marker);
-                        } else if (item.category === 'urban') {
-                            urbanMarkers.addLayer(marker);
-                        }
-                        
-                        console.log(`Marqueur ajouté pour ${item.title} à ${item.geoLocation}`);
-                    } else {
-                        console.warn(`Coordonnées GPS manquantes ou invalides pour ${item.title}`);
-                    }
-                });
-
-                document.querySelectorAll('.map-btn').forEach(button => {
-                    button.addEventListener('click', function() {
-                        const filter = this.getAttribute('data-filter');
-
-                        map.removeLayer(allMarkers);
-                        map.removeLayer(natureMarkers);
-                        map.removeLayer(urbanMarkers);
-
-                        if (filter === 'all') {
-                            map.addLayer(allMarkers);
-                        } else if (filter === 'nature') {
-                            map.addLayer(natureMarkers);
-                        } else if (filter === 'urban') {
-                            map.addLayer(urbanMarkers);
-                        }
-                        
-                        document.querySelectorAll('.map-btn').forEach(btn => {
-                            btn.classList.remove('active');
-                        });
-                        this.classList.add('active');
-                    });
-                });
-                
-                document.querySelector('.map-btn[data-filter="all"]').classList.add('active');
-                
-                console.log('Carte initialisée avec succès');
-
-            } catch (error) {
-                console.error('Erreur lors de l\'initialisation de la carte:', error);
-            }
-        }
-
-        function initializeTimelineAnimation() {
-            const timeline = document.querySelector('.timeline');
-            if (!timeline) return;
-
-            const timelineItems = document.querySelectorAll('.timeline-item');
-            
-            function isElementInViewport(el) {
-                const rect = el.getBoundingClientRect();
-                return (
-                    rect.top <= (window.innerHeight || document.documentElement.clientHeight) * 0.8 &&
-                    rect.bottom >= 0
-                );
-            }
-
-            function checkTimelineElements() {
-                timelineItems.forEach((item, index) => {
-                    if (isElementInViewport(item)) {
-                        setTimeout(() => {
-                            item.classList.add('active');
-                        }, 300 * index);
-                    }
-                });
-            }
-
-            checkTimelineElements();
-
-            window.addEventListener('scroll', checkTimelineElements);
-            window.addEventListener('resize', checkTimelineElements);
-        }
-
         document.addEventListener('DOMContentLoaded', function () {
-            initializeGalleryData().then(() => {
-                initializeGalleryLayout();
-                initializeThemeSwitcher();
-                initializeFocusMode();
-                initializeModalControls();
-                initializeCustomCursor();
-                initializeNavigation();
-                initializeTimelineAnimation();
-
-                setTimeout(() => {
-                    initializeMapFeature();
-                }, 100);
-                
-                setTimeout(() => {
-                    const loadingScreen = document.querySelector('.loading-screen');
-                    if (loadingScreen) {
-                        loadingScreen.classList.add('hidden');
-                    }
-                    reveal();
-                }, 1500);
-            });
+            initializeGalleryData();
+            initializeGalleryLayout();
+            initializeThemeSwitcher();
+            initializeFocusMode();
+            initializeModalControls();
+            initializeCustomCursor();
+            initializeNavigation();
             
+            setTimeout(() => {
+                const loadingScreen = document.querySelector('.loading-screen');
+                if (loadingScreen) {
+                    loadingScreen.classList.add('hidden');
+                }
+                reveal();
+            }, 1500);
             window.addEventListener('scroll', reveal);
             window.addEventListener('scroll', updateNavbarOnScroll);
         });
@@ -1727,59 +1602,100 @@
         }
 
         function initializeGalleryData() {
-            return new Promise((resolve, reject) => {
-                const basePath = window.location.hostname.includes('github.io') 
-                    ? window.location.pathname.split('/').slice(0, -1).join('/') 
-                    : '';
+            try {
+                // Essayer d'abord de charger depuis le localStorage
+                const storedItems = localStorage.getItem('galleryItems');
+                let items = storedItems ? JSON.parse(storedItems) : null;
                 
-                const galleryJsonPath = `${basePath}/gallery.json`;
-                
-                fetch(galleryJsonPath)
-                    .then(response => {
-                        if (!response.ok) {
-                            throw new Error(`HTTP error! status: ${response.status}`);
-                        }
-                        return response.json();
-                    })
-                    .then(data => {
-                        if (data && data.items && Array.isArray(data.items)) {
-                            const updatedItems = data.items.map(item => ({
-                                ...item,
-                                thumbnail: `${basePath}/${item.thumbnail}`,
-                                fullImage: `${basePath}/${item.fullImage}`,
-                                exif: {
-                                    camera: "Canon EOS R5",
-                                    lens: "24-70mm f/2.8",
-                                    focalLength: "50mm",
-                                    aperture: "f/4.0",
-                                    shutterSpeed: "1/250s",
-                                    iso: "400"
+                // Si pas de données dans le localStorage ou données invalides, charger depuis gallery.json
+                if (!items || !Array.isArray(items) || items.length === 0) {
+                    console.log('Chargement des données depuis gallery.json...');
+                    
+                    // Déterminer le chemin de base pour GitHub Pages
+                    const basePath = window.location.hostname.includes('github.io') 
+                        ? window.location.pathname.split('/').slice(0, -1).join('/') 
+                        : '';
+                    
+                    const galleryJsonPath = `${basePath}/gallery.json`;
+                    console.log('Tentative de chargement depuis:', galleryJsonPath);
+                    
+                    fetch(galleryJsonPath)
+                        .then(response => {
+                            console.log('Réponse du serveur:', response.status, response.statusText);
+                            if (!response.ok) {
+                                throw new Error(`HTTP error! status: ${response.status}`);
+                            }
+                            return response.json();
+                        })
+                        .then(data => {
+                            console.log('Données reçues:', data);
+                            if (data && data.items && Array.isArray(data.items)) {
+                                // Mettre à jour les chemins des images pour GitHub Pages
+                                const updatedItems = data.items.map(item => ({
+                                    ...item,
+                                    thumbnail: `${basePath}/${item.thumbnail}`,
+                                    fullImage: `${basePath}/${item.fullImage}`
+                                }));
+                                
+                                window.galleryItems = updatedItems;
+                                localStorage.setItem('galleryItems', JSON.stringify(updatedItems));
+                                console.log(`${updatedItems.length} images chargées depuis gallery.json`);
+                                
+                                // Forcer le rechargement de la galerie
+                                loadGallery('all');
+                            } else {
+                                console.error('Format de données invalide:', data);
+                                throw new Error('Format de données invalide dans gallery.json');
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Erreur lors du chargement de gallery.json:', error);
+                            // Fallback sur les données par défaut avec chemins absolus
+                            window.galleryItems = [
+                                {
+                                    id: 1,
+                                    category: "nature",
+                                    title: "Cascade Mystique",
+                                    description: "Eau cristalline tombant sur des rochers moussus",
+                                    thumbnail: `${basePath}/images/2.jpg`,
+                                    fullImage: `${basePath}/images/2.jpg`,
+                                    geoLocation: [48.791284, 2.261416],
+                                    tags: ["montagne", "eau", "nature"],
+                                    exif: {
+                                        camera: "Canon EOS R5",
+                                        lens: "24-70mm f/2.8",
+                                        focalLength: "50mm",
+                                        aperture: "f/4.0",
+                                        shutterSpeed: "1/250s",
+                                        iso: "400"
+                                    }
                                 }
-                            }));
+                            ];
+                            localStorage.setItem('galleryItems', JSON.stringify(window.galleryItems));
+                            console.log('Utilisation des données par défaut');
                             
-                            window.galleryItems = updatedItems;
-                            window.filteredItems = [...updatedItems];
-                            window.currentIndex = 0;
-                            
-                            localStorage.setItem('galleryItems', JSON.stringify(updatedItems));
-                            console.log(`${updatedItems.length} images chargées depuis gallery.json`);
-                            resolve();
-                        } else {
-                            throw new Error('Format de données invalide dans gallery.json');
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Erreur lors du chargement de gallery.json:', error);
-                        window.galleryItems = [];
-                        window.filteredItems = [];
-                        window.currentIndex = 0;
-                        reject(error);
-                    });
-            });
-
-            setTimeout(() => {
-                protectImages();
-            }, 100);
+                            // Forcer le rechargement de la galerie
+                            loadGallery('all');
+                        });
+                } else {
+                    console.log('Données trouvées dans le localStorage:', items);
+                    window.galleryItems = items;
+                    console.log(`${items.length} images chargées depuis le localStorage`);
+                }
+                
+                // Initialiser les items filtrés et l'index courant
+                window.filteredItems = Array.isArray(window.galleryItems) ? [...window.galleryItems] : [];
+                window.currentIndex = 0;
+                
+                // Précharger les images
+                preloadImagesWithErrorHandling();
+                
+            } catch (error) {
+                console.error('Erreur lors de l\'initialisation des données de la galerie:', error);
+                window.galleryItems = [];
+                window.filteredItems = [];
+                window.currentIndex = 0;
+            }
         }
 
         function preloadImagesWithErrorHandling() {
@@ -1790,10 +1706,6 @@
                 };
                 img.src = item.fullImage;
             });
-
-            setTimeout(() => {
-                protectImages();
-            }, 100);
         }
 
         function initializeGalleryLayout() {
@@ -1809,16 +1721,10 @@
                 });
             });
             loadGallery('all');
-
-            setTimeout(() => {
-                protectImages();
-            }, 100);
         }
 
         function loadGallery(category = 'all') {
             const gallery = document.querySelector('.gallery');
-            if (!gallery || !window.galleryItems) return;
-            
             gallery.innerHTML = '';
 
             window.filteredItems = category === 'all'
@@ -1831,12 +1737,14 @@
                 galleryItem.dataset.id = item.id;
                 galleryItem.dataset.category = item.category;
 
+                // Créer l'image et attendre son chargement pour déterminer ses dimensions
                 const img = new Image();
                 img.onload = function() {
                     const width = this.width;
                     const height = this.height;
                     const ratio = width / height;
 
+                    // Déterminer la taille de l'élément en fonction du ratio
                     if (ratio > 1.5) {
                         galleryItem.classList.add('wide');
                     } else if (ratio < 0.7) {
@@ -1853,13 +1761,16 @@
                         </div>
                     `;
 
+                    // Animation d'apparition progressive
                     setTimeout(() => {
                         galleryItem.classList.add('active');
                     }, 50 * index);
 
+                    // Ajouter les événements
                     galleryItem.addEventListener('click', () => openFocusMode(item, index));
                 };
 
+                // Gérer les erreurs de chargement d'image
                 img.onerror = function() {
                     console.warn(`Impossible de charger l'image: ${item.thumbnail}`);
                     galleryItem.innerHTML = `
@@ -1870,19 +1781,17 @@
                     `;
                 };
 
+                // Commencer le chargement de l'image
                 img.src = item.thumbnail;
                 gallery.appendChild(galleryItem);
             });
 
+            // Optimisation du chargement des images
             if ('loading' in HTMLImageElement.prototype) {
                 document.querySelectorAll('img[loading="lazy"]').forEach(img => {
                     img.setAttribute('loading', 'lazy');
                 });
             }
-
-            setTimeout(() => {
-                protectImages();
-            }, 100);
         }
 
         function initializeThemeSwitcher() {
@@ -2292,6 +2201,125 @@
                 });
             });
         }
+
+        function initializeMapFeature() {
+            const mapContainer = document.getElementById('photo-map');
+
+            if (!mapContainer) {
+                console.error('Conteneur de carte non trouvé');
+                return;
+            }
+
+            try {
+                const map = L.map('photo-map').setView([46.603354, 1.888334], 5);
+
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                }).addTo(map);
+
+                const allMarkers = L.layerGroup().addTo(map);
+                const natureMarkers = L.layerGroup();
+                const urbanMarkers = L.layerGroup();
+
+                window.galleryItems.forEach(item => {
+                    if (item.geoLocation && Array.isArray(item.geoLocation) && item.geoLocation.length === 2) {
+                        const marker = L.marker(item.geoLocation)
+                            .bindPopup(`
+                                <div class="popup-content">
+                                    <img src="${item.imageUrl}" alt="${item.title}" style="width: 100%; max-height: 150px; object-fit: cover;">
+                                    <h4>${item.title}</h4>
+                                    <p>${item.description}</p>
+                                </div>
+                            `);
+
+                        allMarkers.addLayer(marker);
+                        
+                        if (item.category === 'nature') {
+                            natureMarkers.addLayer(marker);
+                        } else if (item.category === 'urban') {
+                            urbanMarkers.addLayer(marker);
+                        }
+                        
+                        console.log(`Marqueur ajouté pour ${item.title} à ${item.geoLocation}`);
+                    }
+                });
+
+                document.querySelectorAll('.map-btn').forEach(button => {
+                    button.addEventListener('click', function() {
+                        const filter = this.getAttribute('data-filter');
+
+                        map.removeLayer(allMarkers);
+                        map.removeLayer(natureMarkers);
+                        map.removeLayer(urbanMarkers);
+
+                        if (filter === 'all') {
+                            map.addLayer(allMarkers);
+                        } else if (filter === 'nature') {
+                            map.addLayer(natureMarkers);
+                        } else if (filter === 'urban') {
+                            map.addLayer(urbanMarkers);
+                        }
+                        
+                        document.querySelectorAll('.map-btn').forEach(btn => {
+                            btn.classList.remove('active');
+                        });
+                        this.classList.add('active');
+                    });
+                });
+                
+                document.querySelector('.map-btn[data-filter="all"]').classList.add('active');
+                
+                console.log('Carte initialisée avec succès');
+
+            } catch (error) {
+                console.error('Erreur lors de l\'initialisation de la carte:', error);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', initializeMapFeature);
+
+        function initializeTimelineAnimation() {
+            const timeline = document.querySelector('.timeline');
+
+            if (!timeline) return;
+            const timelineItems = document.querySelectorAll('.timeline-item');
+
+            window.addEventListener('scroll', () => {
+                timelineItems.forEach((item, index) => {
+                    const itemTop = item.getBoundingClientRect().top;
+
+                    if (itemTop < window.innerHeight * 0.8) {
+                        setTimeout(() => {
+                            item.classList.add('active');
+                        }, 300 * index);
+                    }
+                });
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            function isElementInViewport(el) {
+                const rect = el.getBoundingClientRect();
+                return (
+                    rect.top <= (window.innerHeight || document.documentElement.clientHeight) * 0.8 &&
+                    rect.bottom >= 0
+                );
+            }
+
+            function checkTimelineElements() {
+                const timelineItems = document.querySelectorAll('.timeline-item');
+                
+                timelineItems.forEach(item => {
+                    if (isElementInViewport(item)) {
+                        item.classList.add('active');
+                    }
+                });
+            }
+
+            checkTimelineElements();
+            window.addEventListener('scroll', checkTimelineElements);
+            window.addEventListener('resize', checkTimelineElements);
+        });
 
         localStorage.clear();
     </script>
