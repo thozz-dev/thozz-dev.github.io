@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mentions Légales - JoaoDev</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --gray-50: #f8fafc;
+            --gray-100: #f1f5f9;
+            --gray-200: #e2e8f0;
+            --gray-600: #475569;
+            --gray-700: #334155;
+            --gray-800: #1e293b;
+            --gray-900: #0f172a;
+            --white: #ffffff;
+            --font-primary: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            --space-sm: 1rem;
+            --space-md: 1.5rem;
+            --space-lg: 2rem;
+            --space-xl: 3rem;
+            --radius-lg: 0.75rem;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --transition-fast: 150ms ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-primary);
+            line-height: 1.7;
+            color: var(--gray-900);
+            background: var(--gray-50);
+        }
+
+        .header {
+            background: var(--white);
+            border-bottom: 1px solid var(--gray-200);
+            padding: var(--space-md) 0;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .nav {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            padding: 0 var(--space-lg);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .back-link {
+            margin-left: auto;
+            color: var(--gray-600);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: color var(--transition-fast);
+        }
+
+        .back-link:hover {
+            color: var(--primary);
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: var(--space-xl) var(--space-lg);
+        }
+
+        .page-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--gray-900);
+            margin-bottom: var(--space-lg);
+            text-align: center;
+        }
+
+        .content {
+            background: var(--white);
+            border-radius: var(--radius-lg);
+            padding: var(--space-xl);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .section {
+            margin-bottom: var(--space-xl);
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--gray-800);
+            margin-bottom: var(--space-md);
+            border-bottom: 2px solid var(--primary);
+            padding-bottom: 0.5rem;
+        }
+
+        .section p {
+            margin-bottom: var(--space-md);
+            color: var(--gray-700);
+        }
+
+        .section ul {
+            margin-left: 2rem;
+            margin-bottom: var(--space-md);
+        }
+
+        .section li {
+            margin-bottom: 0.5rem;
+            color: var(--gray-700);
+        }
+
+        .contact-info {
+            background: var(--gray-50);
+            padding: var(--space-lg);
+            border-radius: var(--radius-lg);
+            margin: var(--space-lg) 0;
+        }
+
+        .contact-info h4 {
+            color: var(--gray-800);
+            margin-bottom: var(--space-md);
+            font-size: 1.2rem;
+        }
+
+        .contact-item {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            margin-bottom: 0.5rem;
+            color: var(--gray-700);
+        }
+
+        .contact-item i {
+            color: var(--primary);
+            width: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: var(--space-lg) var(--space-md);
+            }
+
+            .content {
+                padding: var(--space-lg);
+            }
+
+            .page-title {
+                font-size: 2rem;
+            }
+
+            .nav {
+                padding: 0 var(--space-md);
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <nav class="nav">
+            <a href="index.html" class="logo">
+                <i class="fas fa-code"></i>
+                JoaoDev
+            </a>
+            <a href="index.html" class="back-link">
+                <i class="fas fa-arrow-left"></i>
+                Retour au site
+            </a>
+        </nav>
+    </header>
+
+    <div class="container">
+        <h1 class="page-title">Mentions Légales</h1>
+        
+        <div class="content">
+            <div class="section">
+                <h2 class="section-title">1. Informations légales</h2>
+                <p><strong>Dénomination :</strong> JoaoDev</p>
+                <p><strong>Statut juridique :</strong> Auto entrepreneur</p>
+                <p><strong>SIRET :</strong> En cours d'immatriculation</p>
+                <p><strong>Code APE :</strong> 6201Z - Programmation informatique</p>
+                
+                <div class="contact-info">
+                    <h4>Coordonnées</h4>
+                    <div class="contact-item">
+                        <i class="fas fa-envelope"></i>
+                        <span>Email : contact@joao-dev.com</span>
+                    </div>
+                    <div class="contact-item">
+                        <i class="fas fa-phone"></i>
+                        <span>Téléphone : +33 6 31 97 57 93</span>
+                    </div>
+                    <div class="contact-item">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <span>Localisation : France</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2 class="section-title">2. Directeur de publication</h2>
+                <p>Le directeur de la publication du site JoaoDev est le gérant de l'entreprise.</p>
+                <p>Contact : contact@joao-dev.com</p>
+            </div>
+
+            <div class="section">
+                <h2 class="section-title">3. Hébergement du site</h2>
+                <p><strong>Hébergeur :</strong> Netlify, Inc.</p>
+                <p><strong>Adresse :</strong> 2325 3rd Street, Suite 296, San Francisco, CA 94107, USA</p>
+                <p><strong>Site web :</strong> <a href="https://www.netlify.com" target="_blank" style="color: var(--primary);">netlify.com</a></p>
+            </div>
+
+            <div class="section">
+                <h2 class="section-title">4. Propriété intellectuelle</h2>
+                <p>L'ensemble du contenu de ce site (textes, images, vidéos, logos, icônes) est protégé par le droit d'auteur et constitue la propriété exclusive de JoaoDev, sauf mention contraire.</p>
+                <p>Toute reproduction, représentation, modification, publication, adaptation de tout ou partie des éléments du site, quel que soit le moyen ou le procédé utilisé, est interdite, sauf autorisation écrite préalable.</p>
+                <p>Les marques citées sur le site sont déposées par les sociétés qui en sont propriétaires.</p>
+            </div>
+
+            <div class="section">
+                <h2 class="section-title">5. Responsabilité</h2>
+                <p>Les informations contenues sur ce site sont aussi précises que possible et le site est périodiquement remis à jour, mais peut toutefois contenir des inexactitudes ou des omissions.</p>
+                <p>JoaoDev ne pourra être tenu responsable des dommages directs et indirects causés au matériel de l'utilisateur, lors de l'accès au site.</p>
+                <p>JoaoDev décline toute responsabilité quant au contenu des sites vers lesquels des liens hypertextes peuvent renvoyer depuis le présent site.</p>
+            </div>
+
+            <div class="section">
+                <h2 class="section-title">6. Conditions d'utilisation</h2>
+                <p>L'utilisation du site implique l'acceptation pleine et entière des conditions générales d'utilisation décrites ci-dessus.</p>
+                <p>Il est strictement interdit d'utiliser le site aux fins suivantes :</p>
+                <ul>
+                    <li>L'exercice d'activités illégales, frauduleuses ou portant atteinte aux droits ou à la sécurité des tiers</li>
+                    <li>L'atteinte à l'ordre public ou la violation des lois et règlements en vigueur</li>
+                    <li>L'intrusion dans le système informatique d'un tiers ou toute activité de nature à nuire, contrôler, interférer, ou intercepter tout ou partie du système informatique d'un tiers</li>
+                    <li>L'envoi d'emails non sollicités et/ou de prospection ou sollicitation commerciale</li>
+                </ul>
+            </div>
+
+            <div class="section">
+                <h2 class="section-title">7. Liens hypertextes</h2>
+                <p>Le site peut contenir des liens hypertextes vers d'autres sites présents sur le réseau Internet. Les liens vers ces autres ressources vous font quitter le site.</p>
+                <p>Il est possible de créer un lien vers la page de présentation de ce site sans autorisation expresse de JoaoDev. Aucune autorisation ou demande d'information préalable ne peut être exigée par l'éditeur à l'égard d'un site qui souhaite établir un lien vers le site de l'éditeur.</p>
+                <p>Il convient toutefois d'afficher ce site dans une nouvelle fenêtre du navigateur. Cependant, JoaoDev se réserve le droit de demander la suppression d'un lien qu'elle estime non conforme à l'objet du site.</p>
+            </div>
+
+            <div class="section">
+                <h2 class="section-title">8. Force majeure</h2>
+                <p>L'exécution des obligations de JoaoDev au titre des présentes est suspendue en cas de survenance d'un cas de force majeure qui en empêcherait l'exécution. JoaoDev avisera le cocontractant de la survenance d'un tel événement dès que possible.</p>
+                <p>Sont considérés comme cas de force majeure ou cas fortuits, outre ceux habituellement retenus par la jurisprudence des cours et des tribunaux français : les blocages des moyens de transports ou d'approvisionnements, tremblements de terre, incendies, tempêtes, inondations, foudre, arrêt des réseaux de télécommunication ou difficulté d'approvisionnement en énergie imputable à l'opérateur.</p>
+            </div>
+
+            <div class="section">
+                <h2 class="section-title">9. Évolution des conditions d'utilisation</h2>
+                <p>JoaoDev se réserve la possibilité de modifier, à tout moment et sans préavis, les présentes conditions d'utilisation afin de les adapter aux évolutions du site et/ou de son usage.</p>
+            </div>
+
+            <div class="section">
+                <h2 class="section-title">10. Droit applicable et juridiction compétente</h2>
+                <p>Les règles en matière de droit, applicables pour le présent site, sont uniquement le droit français.</p>
+                <p>En cas de litige, les parties s'efforceront de trouver une solution amiable. À défaut, les tribunaux français seront seuls compétents pour connaître du litige.</p>
+            </div>
+
+            <div style="margin-top: var(--space-xl); padding-top: var(--space-lg); border-top: 1px solid var(--gray-200); color: var(--gray-600); font-size: 0.9rem; text-align: center;">
+                <p><strong>Dernière mise à jour :</strong> 15 janvier 2025</p>
+                <p>Pour toute question relative aux présentes mentions légales, vous pouvez nous contacter à : <a href="mailto:contact@joao-dev.com" style="color: var(--primary);">contact@joao-dev.com</a></p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+

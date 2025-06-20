@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Politique de Confidentialité - JoaoDev</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --gray-50: #f8fafc;
+            --gray-100: #f1f5f9;
+            --gray-200: #e2e8f0;
+            --gray-600: #475569;
+            --gray-700: #334155;
+            --gray-800: #1e293b;
+            --gray-900: #0f172a;
+            --white: #ffffff;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --font-primary: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            --space-sm: 1rem;
+            --space-md: 1.5rem;
+            --space-lg: 2rem;
+            --space-xl: 3rem;
+            --radius-lg: 0.75rem;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --transition-fast: 150ms ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-primary);
+            line-height: 1.7;
+            color: var(--gray-900);
+            background: var(--gray-50);
+        }
+
+        .header {
+            background: var(--white);
+            border-bottom: 1px solid var(--gray-200);
+            padding: var(--space-md) 0;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .nav {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            padding: 0 var(--space-lg);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .back-link {
+            margin-left: auto;
+            color: var(--gray-600);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: color var(--transition-fast);
+        }
+
+        .back-link:hover {
+            color: var(--primary);
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: var(--space-xl) var(--space-lg);
+        }
+
+        .page-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--gray-900);
+            margin-bottom: var(--space-lg);
+            text-align: center;
+        }
+
+        .content {
+            background: var(--white);
+            border-radius: var(--radius-lg);
+            padding: var(--space-xl);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .intro {
+            background: var(--gray-50);
+            padding: var(--space-lg);
+            border-radius: var(--radius-lg);
+            margin-bottom: var(--space-xl);
+            border-left: 4px solid var(--primary);
+        }
+
+        .intro p {
+            margin: 0;
+            color: var(--gray-700);
+            font-size: 1.1rem;
+        }
+
+        .section {
+            margin-bottom: var(--space-xl);
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--gray-800);
+            margin-bottom: var(--space-md);
+            border-bottom: 2px solid var(--primary);
+            padding-bottom: 0.5rem;
+        }
+
+        .section p {
+            margin-bottom: var(--space-md);
+            color: var(--gray-700);
+        }
+
+        .section ul {
+            margin-left: 2rem;
+            margin-bottom: var(--space-md);
+        }
+
+        .section li {
+            margin-bottom: 0.5rem;
+            color: var(--gray-700);
+        }
+
+        .highlight-box {
+            background: var(--gray-50);
+            padding: var(--space-lg);
+            border-radius: var(--radius-lg);
+            margin: var(--space-lg) 0;
+            border-left: 4px solid var(--success);
+        }
+
+        .warning-box {
+            background: rgba(245, 158, 11, 0.1);
+            padding: var(--space-lg);
+            border-radius: var(--radius-lg);
+            margin: var(--space-lg) 0;
+            border-left: 4px solid var(--warning);
+        }
+
+        .highlight-box h4, .warning-box h4 {
+            color: var(--gray-800);
+            margin-bottom: var(--space-md);
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: var(--space-lg) 0;
+            background: var(--white);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .data-table th {
+            background: var(--primary);
+            color: white;
+            padding: var(--space-md);
+            text-align: left;
+            font-weight: 600;
+        }
+
+        .data-table td {
+            padding: var(--space-md);
+            border-bottom: 1px solid var(--gray-200);
+            color: var(--gray-700);
+        }
+
+        .data-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .contact-info {
+            background: var(--gray-50);
+            padding: var(--space-lg);
+            border-radius: var(--radius-lg);
+            margin: var(--space-lg) 0;
+        }
+
+        .contact-info h4 {
+            color: var(--gray-800);
+            margin-bottom: var(--space-md);
+            font-size: 1.2rem;
+        }
+
+        .contact-item {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            margin-bottom: 0.5rem;
+            color: var(--gray-700);
+        }
+
+        .contact-item i {
+            color: var(--primary);
+            width: 20px;
+        }
+
+        .rights-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: var(--space-md);
+            margin: var(--space-lg) 0;
+        }
+
+        .right-card {
+            background: var(--white);
+            padding: var(--space-lg);
+            border-radius: var(--radius-lg);
+            border: 2px solid var(--gray-200);
+            transition: border-color var(--transition-fast);
+        }
+
+        .right-card:hover {
+            border-color: var(--primary);
+        }
+
+        .right-card h5 {
+            color: var(--gray-800);
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .right-card p {
+            color: var(--gray-600);
+            font-size: 0.9rem;
+            margin: 0;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: var(--space-lg) var(--space-md);
+            }
+
+            .content {
+                padding: var(--space-lg);
+            }
+
+            .page-title {
+                font-size: 2rem;
+            }
+
+            .nav {
+                padding: 0 var(--space-md);
+            }
+
+            .data-table {
+                font-size: 0.9rem;
+            }
+
+            .data-table th, .data-table td {
+                padding: 0.75rem;
+            }
+
+            .rights-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <nav class="nav">
+            <a href="index.html" class="logo">
+                <i class="fas fa-code"></i>
+                JoaoDev
+            </a>
+            <a href="index.html" class="back-link">
+                <i class="fas fa-arrow-left"></i>
+                Retour au site
+            </a>
+        </nav>
+    </header>
+
+    <div class="container">
+        <h1 class="page-title">Politique de Confidentialité</h1>
+        
+        <div class="content">
+            <div class="intro">
+                <p><strong>Votre vie privée est importante pour nous.</strong> Cette politique de confidentialité explique quelles informations personnelles nous collectons, comment nous les utilisons et protégeons vos données lorsque vous visitez et utilisez notre site web JoaoDev.</p>
+            </div>
+
+            <div class="section">
+                <h2 class="section-title">1. Responsable du traitement des données</h2>
+                <div class="contact-info">
+                    <h4>JoaoDev</h4>
+                    <div class="contact-item">
+                        <i class="fas fa-envelope"></i>
+                        <span>Email : contact@joao-dev.com</span>
+                    </div>
+                    <div class="contact-item">
+                        <i class="fas fa-phone"></i>
+                        <span>Téléphone : +33 6 31 97 57 93</span>
+                    </div>
+                    <div class="contact-item">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <span>Localisation : France</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2 class="section-title">2. Données collectées</h2>
+                <p>Nous collectons différents types de données pour vous fournir et améliorer nos services :</p>
+                
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Type de données</th>
+                            <th>Finalité</th>
+                            <th>Base légale</th>
+                            <th>Durée de conservation</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Données d'identification (nom, prénom, email)</td>
+                            <td>Traitement des demandes de devis et communication</td>
+                            <td>Consentement / Intérêt légitime</td>
+                            <td>3 ans après dernier contact</td>
+                        </tr>
+                        <tr>
+                            <td>Données de contact (téléphone, entreprise)</td>
+                            <td>Suivi commercial et support client</td>
+                            <td>Consentement / Exécution du contrat</td>
+                            <td>Durée de la relation + 3 ans</td>
+                        </tr>
+                        <tr>
+                            <td>Données de navigation (cookies, IP)</td>
+                            <td>Amélioration de l'expérience utilisateur</td>
+                            <td>Consentement / Intérêt légitime</td>
+                            <td>13 mois maximum</td>
+                        </tr>
+                        <tr>
+                            <td>Données de projet (besoins, secteur d'activité)</td>
+                            <td>Personnalisation des offres</td>
+                            <td>Consentement / Exécution du contrat</td>
+                            <td>Durée du projet + 5 ans</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="section">
+                <h2 class="section-title">3. Finalités du traitement</h2>
+                <p>Vos données personnelles sont traitées pour les finalités suivantes :</p>
+                <ul>
+                    <li><strong>Gestion des demandes de devis :</strong> Traitement et réponse à vos demandes de création de sites web</li>
+                    <li><strong>Exécution des contrats :</strong> Réalisation des prestations de développement web</li>
+                    <li><strong>Communication commerciale :</strong> Envoi d'informations sur nos services (avec votre consentement)</li>
+                    <li><strong>Support technique :</strong> Assistance et maintenance des sites créés</li>
+                    <li><strong>Amélioration des services :</strong> Analyse anonymisée pour optimiser notre offre</li>
+                    <li><strong>Obligations légales :</strong> Respect des obligations comptables et fiscales</li>
+                </ul>
+            </div>
+
+            <div class="section">
+                <h2 class="section-title">4. Base légale du traitement</h2>
+                <p>Le traitement de vos données personnelles repose sur :</p>
+                <ul>
+                    <li><strong>Votre consentement :</strong> Pour l'envoi de communications commerciales et l'utilisation de cookies non essentiels</li>
+                    <li><strong>L'exécution du contrat :</strong> Pour la réalisation des prestations commandées</li>
+                    <li><strong>L'intérêt légitime :</strong> Pour l'amélioration de nos services et la prospection commerciale</li>
+                    <li><strong>L'obligation légale :</strong> Pour le respect des obligations comptables et fiscales</li>
+                </ul>
+            </div>
+
+            <div class="section">
+                <h2 class="section-title">5. Partage des données</h2>
+                <div class="highlight-box">
+                    <h4><i class="fas fa-shield-alt"></i> Principe de confidentialité</h4>
+                    <p>Nous ne vendons, ne louons ni ne divulguons vos données personnelles à des tiers à des fins commerciales.</p>
+                </div>
+                
+                <p>Vos données peuvent être partagées uniquement dans les cas suivants :</p>
+                <ul>
+                    <li><strong>Prestataires techniques :</strong> Hébergement (Netlify), service d'emails (EmailJS) - sous accord de confidentialité</li>
+                    <li><strong>Autorités légales :</strong> En cas d'obligation légale ou de demande judiciaire</li>
+                    <li><strong>Sous-traitants :</strong> Uniquement si nécessaire à l'exécution du service, sous contrat strict</li>
+                </ul>
+                
+                <div class="warning-box">
+                    <h4><i class="fas fa-exclamation-triangle"></i> Transferts internationaux</h4>
+                    <p>Certains de nos prestataires (Netlify, EmailJS) peuvent traiter vos données hors UE. Ces transferts sont encadrés par des garanties appropriées (décision d'adéquation, clauses contractuelles types).</p>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2 class="section-title">6. Vos droits RGPD</h2>
+                <p>Conformément au Règlement Général sur la Protection des Données, vous disposez des droits suivants :</p>
+                
+                <div class="rights-grid">
+                    <div class="right-card">
+                        <h5><i class="fas fa-eye"></i> Droit d'accès</h5>
+                        <p>Obtenir une copie de vos données personnelles et des informations sur leur traitement.</p>
+                    </div>
+                    <div class="right-card">
+                        <h5><i class="fas fa-edit"></i> Droit de rectification</h5>
+                        <p>Faire corriger des données inexactes ou incomplètes vous concernant.</p>
+                    </div>
+                    <div class="right-card">
+                        <h5><i class="fas fa-trash"></i> Droit à l'effacement</h5>
+                        <p>Demander la suppression de vos données dans certaines conditions.</p>
+                    </div>
+                    <div class="right-card">
+                        <h5><i class="fas fa-pause"></i> Droit à la limitation</h5>
+                        <p>Demander la limitation du traitement de vos données dans certains cas.</p>
+                    </div>
+                    <div class="right-card">
+                        <h5><i class="fas fa-download"></i> Droit à la portabilité</h5>
+                        <p>Récupérer vos données dans un format structuré et lisible.</p>
+                    </div>
+                    <div class="right-card">
+                        <h5><i class="fas fa-ban"></i> Droit d'opposition</h5>
+                        <p>Vous opposer au traitement de vos données pour des raisons légitimes.</p>
+                    </div>
+                </div>
+
+                <div class="highlight-box">
+                    <h4><i class="fas fa-info-circle"></i> Comment exercer vos droits ?</h4>
+                    <p>Pour exercer ces droits, contactez-nous à <strong>contact@joao-dev.com</strong> en précisant votre demande et en joignant une copie de votre pièce d'identité. Nous nous engageons à répondre dans un délai de 30 jours maximum.</p>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2 class="section-title">7. Cookies et technologies similaires</h2>
+                <p>Notre site utilise des cookies pour améliorer votre expérience de navigation :</p>
+                <ul>
+                    <li><strong>Cookies essentiels :</strong> Nécessaires au fonctionnement du site (préférences de thème, sécurité)</li>
+                    <li><strong>Cookies d'analyse :</strong> Pour comprendre comment vous utilisez le site (avec votre consentement)</li>
+                    <li><strong>Cookies de performance :</strong> Pour optimiser les temps de chargement et la navigation</li>
+                </ul>
+                <p>Vous pouvez gérer vos préférences de cookies via les paramètres de votre navigateur ou notre bandeau de consentement.</p>
+            </div>
+
+            <div class="section">
+                <h2 class="section-title">8. Sécurité des données</h2>
+                <p>Nous mettons en œuvre des mesures techniques et organisationnelles appropriées pour protéger vos données :</p>
+                <ul>
+                    <li><strong>Chiffrement :</strong> Toutes les communications sont sécurisées par protocole HTTPS/SSL</li>
+                    <li><strong>Accès restreint :</strong> Les données sont accessibles uniquement aux personnes autorisées</li>
+                    <li><strong>Sauvegardes sécurisées :</strong> Copies de sécurité chiffrées et régulières</li>
+                    <li><strong>Mise à jour :</strong> Systèmes et logiciels régulièrement mis à jour</li>
+                    <li><strong>Surveillance :</strong> Monitoring continu pour détecter les tentatives d'intrusion</li>
+                </ul>
+            </div>
+
+            <div class="section">
+                <h2 class="section-title">9. Conservation des données</h2>
+                <p>Vos données sont conservées uniquement pendant la durée nécessaire aux finalités pour lesquelles elles ont été collectées :</p>
+                <ul>
+                    <li><strong>Prospects :</strong> 3 ans après le dernier contact</li>
+                    <li><strong>Clients :</strong> Durée de la relation contractuelle + 3 ans</li>
+                    <li><strong>Données comptables :</strong> 10 ans (obligation légale)</li>
+                    <li><strong>Cookies :</strong> 13 mois maximum</li>
+                </ul>
+                
+                <p>À l'expiration de ces délais, vos données sont automatiquement supprimées ou anonymisées.</p>
+            </div>
+
+            <div class="section">
+                <h2 class="section-title">10. Mineurs</h2>
+                <div class="warning-box">
+                    <h4><i class="fas fa-child"></i> Protection des mineurs</h4>
+                    <p>Nos services s'adressent aux entreprises et aux professionnels. Nous ne collectons pas sciemment des données personnelles de mineurs de moins de 16 ans. Si vous êtes parent et que vous pensez que votre enfant nous a fourni des données personnelles, contactez-nous immédiatement.</p>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2 class="section-title">11. Modifications de cette politique</h2>
+                <p>Nous pouvons mettre à jour cette politique de confidentialité pour refléter :</p>
+                <ul>
+                    <li>Les évolutions de nos services</li>
+                    <li>Les changements législatifs ou réglementaires</li>
+                    <li>Les améliorations de nos pratiques de protection des données</li>
+                </ul>
+                <p>Toute modification substantielle vous sera notifiée par email ou via un avis visible sur notre site web. La version mise à jour prendra effet 30 jours après la notification.</p>
+            </div>
+
+            <div class="section">
+                <h2 class="section-title">12. Réclamations</h2>
+                <p>En cas de préoccupation concernant le traitement de vos données personnelles, vous pouvez :</p>
+                <ul>
+                    <li>Nous contacter directement à <strong>contact@joao-dev.com</strong></li>
+                    <li>Déposer une plainte auprès de la CNIL (Commission Nationale de l'Informatique et des Libertés) :
+                        <ul style="margin-top: 0.5rem;">
+                            <li>En ligne : <a href="https://www.cnil.fr/fr/plaintes" target="_blank" style="color: var(--primary);">cnil.fr/plaintes</a></li>
+                            <li>Par courrier : CNIL - 3 Place de Fontenoy - TSA 80715 - 75334 PARIS CEDEX 07</li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="section">
+                <h2 class="section-title">13. Contact</h2>
+                <div class="contact-info">
+                    <h4>Délégué à la Protection des Données (DPO)</h4>
+                    <p>Pour toute question relative à cette politique de confidentialité ou à l'exercice de vos droits :</p>
+                    <div class="contact-item">
+                        <i class="fas fa-envelope"></i>
+                        <span>Email : contact@joao-dev.com</span>
+                    </div>
+                    <div class="contact-item">
+                        <i class="fas fa-phone"></i>
+                        <span>Téléphone : +33 6 31 97 57 93</span>
+                    </div>
+                    <div class="contact-item">
+                        <i class="fas fa-clock"></i>
+                        <span>Délai de réponse : 30 jours maximum</span>
+                    </div>
+                </div>
+            </div>
+
+            <div style="margin-top: var(--space-xl); padding-top: var(--space-lg); border-top: 1px solid var(--gray-200); color: var(--gray-600); font-size: 0.9rem; text-align: center;">
+                <p><strong>Dernière mise à jour :</strong> 15 janvier 2025</p>
+                <p>Cette politique de confidentialité est rédigée en français. En cas de traduction, la version française fait foi.</p>
+                <p><strong>Version :</strong> 2.0 | <strong>Conformité RGPD :</strong> ✓ Validée</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
